@@ -15,7 +15,7 @@
  						"gutter": "4", //Gutter between pole and drop down menu "0" - default
  						"lineSeparator": "; ", //Separator between output result line
  						"fildSeparator": " \\ ", //Separator between output fild
- 						"mustFill": [0,1,2], //Number of mandatory Fild in lines array; "false" - for non strict mode; "true" - for strict mode
+ 						"mustFill": [true,true,true], //Wich fild mast be entered for add next line. Mask mast be for correct work othervise input cheked like true.
  						"lines": [{
 	 							"head": "Телфон",
 	 							"tag": "<input>",
@@ -61,8 +61,11 @@
 					onmouseout="this.style.backgroundColor=\'#DCDCDC\';"\
 					>СОХРАНИТЬ</a><table><tbody></tbody></table></div>',
 			"conTableHead": null
-
  		};
+
+
+//ОБРАТИТЬ ВНИМАНИЕ НА ТО ЧТО МЖОЕТ БЫТЬ НЕ ТОЛЬКО INPUT ЭЛЕМЕНТ, НО И ЧТО-ТО ДРУГОЕ,
+//ТЕМ НЕ МЕНИЕ СКРИПТ РАСЧИТАН, НА ТО ЧТО БУДУТ ТОЛЬКО INPUT ЭЛЕМЕНТЫ В КАЧЕСТВЕ ПОЛЕЙ
  		
  		function extend(obj1, obj2){
  			if (obj1){
@@ -92,12 +95,9 @@
  		};
 
  		function getDataFromEl(data){
- 			console.log(data);
  			var line = $(data.currentTarget).val(),
  				lines = line.split(data.data.lineSeparator),
  				resultData = [];
-
- 			console.log(lines);
 
  			if (lines[0] != line) {
  				for (var i = 0, l = lines.length; i < l; i++){
@@ -116,10 +116,6 @@
  				table = modal.find("tbody"),
  				result = "",
  				key = false;
-
-// ДОБАВИТЬ УСЛОВИЯ ПО ДОБАВЛЕНИЮ СТРОКИ В МОДАЛЬНОЕ ОКНО. В INPUTMASK.
-// ЕСТЬ ВЕРЯТНОСТЬ ДОБАВЛЕНИЯ ПУСТОЙ СТРОИ ПРИ УДАЛЕНИИ СТРОКИ ИЗ СЕРЕДИНЫ.
-// Добавление лини сделать общедоступной функцией, для того что бы корректро реагировать на правильную маску.
 
  			//Get data from all fild
  			var lengthj = table.find("tr").length - 1;
@@ -160,8 +156,6 @@
 				head = $("<thead>").append("<tr>"),
 				inpMaskArr = [],
 				givenMask = obj.mustFill;
-				compliteMask = [],
-				count = 1;
 
 		 	if (lineLength){
 				for (var i = 0; i < lineLength ; i++){
@@ -185,14 +179,20 @@
 			//Remove line or clear last input date
 			line.find(".remDDModalLine").click(function(){
 				var temp = $(this).closest("tbody").find("tr");
-				if(temp.length == 1){
+				if(temp.length < 2){
 					temp.find("input").each(function(){
 						$(this).val("");
 					});
+					var trigLine = $(this).closest("tr");
+					trigLine.unbind("lineOk");
+					trigLine.one("lineOk", function(){ $(this).parent().trigger("complite"); });
 				} else {
-					$(this).parent().parent().remove();
+					$(this).closest("tr").remove();
 				}
 			});
+			//Add one trigger to add next line
+			line.one("lineOk", function(){ $(this).parent().trigger("complite"); });
+
 
 			// Make head line in Table
 			glovar.conTableHead = head;
@@ -205,40 +205,34 @@
 
 					retLine.find("input").each(function(index){
 						var copyindex = index;
-						var obj = extend(inpMaskArr[index], { "oncomplete": function(el){ lineCheck($(el.currentTarget).data('index')); } });
+						var obj = extend(inpMaskArr[index], { "oncomplete": function(){ lineCheck(this); } });
 						if (obj) {
 							$(this).inputmask(obj);							
 						} else {
-							$(this).bind('focus', function(el){ lineCheck($(el.currentTarget).data('index')); });
+							$(this).bind('focus', function(){ lineCheck(this); });
 						}
 
 						$(this).val(linearr[index]);
 					});
 
-					function lineCheck(event){
-						compliteMask[event] = true;
+					//Control all input in line with givenMask
+					function lineCheck(el){
 						var check = true;
-						for (var i = 0, l = givenMask.length; i < l; i++){
-							if(!compliteMask[givenMask[i]]){
-								check = false;
+						$(el).closest("tr").find("input").each(function(id, el){
+							if (givenMask[id]){
+								check = $(el).inputmask("isComplete") && check;
 							}
-						}
-						console.log(count);
+						});
 
-						if(check && count){
-							retLine.count--;
-							$(retLine).closest("tbody").trigger("complite");
+						if(check){
+							$(retLine).trigger("lineOk");
 						}
-					}
+					};
 
 					return retLine;
 				}
 			}
  		};
-
- 		// function newLine(line, container, data){
- 		// 	return container.find("tbody").append(line.newLine()).one("complite", function(){newLine(arguments[0], arguments[1], arguments[2])});
- 		// }
 
  		var handler = {
  			"phoneList": function(event){
@@ -251,6 +245,8 @@
  					tbody = container.find("tbody"),//Set container tag
  					line = tableLine(event.data),//Set template for current pole
  					lineData = getDataFromEl(event);//Get data from curent pole
+
+ 				event.currentTarget.blur();
 
 	 			//Add head line position
 	 			container.find("table").prepend(glovar.conTableHead);
