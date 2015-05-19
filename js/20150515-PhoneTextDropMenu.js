@@ -160,7 +160,8 @@
 				head = $("<thead>").append("<tr>"),
 				inpMaskArr = [],
 				givenMask = obj.mustFill;
-				compliteMask = [];
+				compliteMask = [],
+				count = 1;
 
 		 	if (lineLength){
 				for (var i = 0; i < lineLength ; i++){
@@ -222,18 +223,22 @@
 								check = false;
 							}
 						}
-						if(check){
-							$(retLine).trigger("complite");
+						console.log(count);
+
+						if(check && count){
+							retLine.count--;
+							$(retLine).closest("tbody").trigger("complite");
 						}
 					}
+
 					return retLine;
 				}
 			}
  		};
 
- 		function newLine(line, container, data){
- 			return container.find("tbody").append(line.newLine()).one("complite", function(){newLine(arguments[0], arguments[1], arguments[2])});
- 		}
+ 		// function newLine(line, container, data){
+ 		// 	return container.find("tbody").append(line.newLine()).one("complite", function(){newLine(arguments[0], arguments[1], arguments[2])});
+ 		// }
 
  		var handler = {
  			"phoneList": function(event){
@@ -242,7 +247,8 @@
  					position = target.position(),
  					height = target.outerHeight(),
  					gutter = event.data.gutter || 0,
- 					container = $(glovar.container),//Set container tag
+ 					container = $(glovar.container),
+ 					tbody = container.find("tbody"),//Set container tag
  					line = tableLine(event.data),//Set template for current pole
  					lineData = getDataFromEl(event);//Get data from curent pole
 
@@ -253,23 +259,26 @@
 	 			position.top = position.top + height + (+gutter);
 	 			container.offset(position);
 
-	 			//Add hendlers to close and save date
+	 			//Add hendlers 
+	 			//
+	 			//close
 	 			container.find(".closeDDModal").click(container,closeDDMenu);
+	 			//save
 	 			container.find(".sendDDModal").click(event, saveDataToEl);
+	 			//complite line
+ 				tbody.bind("complite", function(){tbody.append(line.newLine());});	 			
+ 				//
 
 	 			//Add first lines with data from page
 	 			if ($.isArray(lineData[0])) {
 	 				for (var i = 0, l = lineData.length; i < l; i++){
-	 					container.find("tbody").append(line.newLine(lineData[i]));
+	 					tbody.append(line.newLine(lineData[i]));
 	 				};
-					container.find("tbody").append(line.newLine());
 	 			} else if (lineData.length > 1){
-	 				container.find("tbody").append(line.newLine(lineData));
-	 				container.find("tbody").append(line.newLine());
-	 			} else {
-	 				newLine(line, container);
-	 				// container.find("tbody").append(line.newLine()).one("complite", function(){container.find("tbody").append(line.newLine())});
+	 				tbody.append(line.newLine(lineData));
 	 			};
+	 			//Add new line
+	 			tbody.append(line.newLine());
 
 				openDDMenu(container);
  				}
