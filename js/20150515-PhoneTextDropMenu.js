@@ -1,6 +1,6 @@
  // Plugin make drop down menu wich specified in object "glovar" below
- // Version 1.02
- // Date: 15.05.2015
+ // Version 2.03
+ // Date: 20.05.2015
  // Require: jquery, jquery.inputmask
 
  jQuery(document).ready(function() {
@@ -9,42 +9,73 @@
  			"handlers": [
  				{
  					"selector": ".ddPhone input",
- 					"hname": "phoneList",
  					"active": true,
  					"param": {
  						"gutter": "4", //Gutter between pole and drop down menu "0" - default
  						"lineSeparator": "; ", //Separator between output result line
  						"fildSeparator": " \\ ", //Separator between output fild
- 						"mustFill": [true,true,true], //Wich fild mast be entered for add next line. Mask mast be for correct work othervise input cheked like true.
+ 						"mustFill": [true,true,false,true,true], //Wich fild mast be entered for add next line. Mask mast be for correct work othervise input cheked like true.
  						"lines": [{
 	 							"head": "Телфон",
-	 							"tag": "<input>",
+	 							"tag": "<input>", // Mast be input, but can by a style data inside
 	 							"mask": { //Mask for fild
 	 								"mask": "99-aaa",
 	 								"clearIncomplete": true
-	 							},
-	 							"style": "background-color:white"
+	 							}
 	 						},{
 	 							"head": "Добавочный",
 	 							"tag": "<input>",
 	 							"mask": {
 	 								"mask": "99-99999"
-	 							},
-	 							"style": "background-color:white"
+	 							}
 	 						},{
 	 							"head": "Должность",
 	 							"tag": "<input>",
-	 							"mask": null,
-	 							"style": "background-color:white"
+	 							"mask": null
+	 						},{
+	 							"head": "Добавочный1",
+	 							"tag": "<input>",
+	 							"mask": {
+	 								"mask": "9999999"
+	 							}
+	 						},{
+	 							"head": "Добавочный2",
+	 							"tag": "<input>",
+	 							"mask": {
+	 								"mask": "999"
+	 							}
 	 						}
  						]
  					}
  				},
 				{
  					"selector": ".ddText textarea",
- 					"hname": "",
- 					"active": false,
- 					"param": null
+ 					"active": true,
+ 					"param": {
+ 						"gutter": "4", //Gutter between pole and drop down menu "0" - default
+ 						"lineSeparator": "\n", //Separator between output result line
+ 						"fildSeparator": " \\ ", //Separator between output fild
+ 						"mustFill": [true,true,false], //Wich fild mast be entered for add next line. Mask mast be for correct work othervise input cheked like true.
+ 						"lines": [{
+	 							"head": "Телфон",
+	 							"tag": "<input>", // Mast be input, but can by a style data inside
+	 							"mask": { //Mask for fild
+	 								"mask": "99-aaa",
+	 								"clearIncomplete": true
+	 							}
+	 						},{
+	 							"head": "Добавочный",
+	 							"tag": "<input>",
+	 							"mask": {
+	 								"mask": "99-99999"
+	 							}
+	 						},{
+	 							"head": "Должность",
+	 							"tag": "<input>",
+	 							"mask": null,
+	 						}
+ 						]
+ 					}
  				}
  			],
  			"cape" : {
@@ -63,10 +94,6 @@
 			"conTableHead": null
  		};
 
-
-//ОБРАТИТЬ ВНИМАНИЕ НА ТО ЧТО МЖОЕТ БЫТЬ НЕ ТОЛЬКО INPUT ЭЛЕМЕНТ, НО И ЧТО-ТО ДРУГОЕ,
-//ТЕМ НЕ МЕНИЕ СКРИПТ РАСЧИТАН, НА ТО ЧТО БУДУТ ТОЛЬКО INPUT ЭЛЕМЕНТЫ В КАЧЕСТВЕ ПОЛЕЙ
- 		
  		function extend(obj1, obj2){
  			if (obj1){
 				for (key in obj2){
@@ -99,6 +126,8 @@
  				lines = line.split(data.data.lineSeparator),
  				resultData = [];
 
+ 				lines.length -= 1;
+
  			if (lines[0] != line) {
  				for (var i = 0, l = lines.length; i < l; i++){
  					resultData[i] = lines[i].split(data.data.fildSeparator);
@@ -118,34 +147,30 @@
  				key = false;
 
  			//Get data from all fild
- 			var lengthj = table.find("tr").length - 1;
  			table.find("tr").each(function(j){
  				var length = $(this).find("input").length - 1,
  					partOfData = "";
- 				key = false;
+ 				key = true;
  				$(this).find("input").each(function(i){
  					if (i < length) {
  						partOfData += $(this).val() + data.data.data.fildSeparator;
  					} else {
 						partOfData += $(this).val();
  					};
- 					if ($(this).val() != "") {
- 						key = true;
+ 					if (!$(this).inputmask("isComplete")) {
+ 						key = false;
  					};
  				});
 
  				//Check on empty fild and last element
 	 			if (key){
-	 				result += partOfData;
-		 			if (j < lengthj) {
-						result += data.data.data.lineSeparator;				
-		 			};
+	 				result += partOfData + data.data.data.lineSeparator;
 	 			}
  			});
 
  			//Save data in current fild and close
  			$(data.data.currentTarget).val(result);
- 			closeDDMenu({"data":modal});
+			closeDDMenu({"data":modal});
  		};
 
  		function tableLine(obj){
@@ -185,14 +210,13 @@
 					});
 					var trigLine = $(this).closest("tr");
 					trigLine.unbind("lineOk");
+					//Used not standart handler for list line add action
 					trigLine.one("lineOk", function(){ $(this).parent().trigger("complite"); });
 				} else {
-					$(this).closest("tr").remove();
+					$(this).closest("tr").fadeOut("fast", function(){ $(this).remove(); });
+					// $(this).closest("tr").remove();
 				}
 			});
-			//Add one trigger to add next line
-			line.one("lineOk", function(){ $(this).parent().trigger("complite"); });
-
 
 			// Make head line in Table
 			glovar.conTableHead = head;
@@ -234,6 +258,11 @@
 			}
  		};
 
+ 		function addHandlerOnComplite(el){
+ 			var lastLine = el.find("tr").last();
+ 			lastLine.one("lineOk", function(){ el.trigger("complite"); });
+ 		};
+
  		var handler = {
  			"phoneList": function(event){
 
@@ -262,7 +291,10 @@
 	 			//save
 	 			container.find(".sendDDModal").click(event, saveDataToEl);
 	 			//complite line
- 				tbody.bind("complite", function(){tbody.append(line.newLine());});	 			
+ 				tbody.bind("complite", function(){
+ 					tbody.append(line.newLine());
+ 					addHandlerOnComplite(tbody);
+ 				});	 			
  				//
 
 	 			//Add first lines with data from page
@@ -276,6 +308,9 @@
 	 			//Add new line
 	 			tbody.append(line.newLine());
 
+	 			//Add hendler to last line
+	 			addHandlerOnComplite(tbody);
+
 				openDDMenu(container);
  				}
  		};
@@ -286,7 +321,7 @@
 		 			//Add hendler in all elements in the DOM
 		 			if(glovar.handlers[i].active) {
 		 				$(glovar.handlers[i].selector).each( function(){
-			 				$(this).bind("click", glovar.handlers[i].param, handler[glovar.handlers[i].hname]);
+			 				$(this).bind("click", glovar.handlers[i].param, handler.phoneList);
 
 			 				// Append cape in DOM & save it in glovar
 			 				if (!glovar.cape.tag) {
