@@ -1,0 +1,4 @@
+<script>
+    var newHeight = document.documentElement.clientHeight - document.getElementById('s4-ribbonrow').offsetHeight;
+    document.getElementById('s4-workspace').style.height = newHeight + "px";
+</script>
