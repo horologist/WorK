@@ -22,5 +22,28 @@
 <script type="text/javascript" src="jquery-2.1.3.min.js"></script>
 <script type="text/javascript" src="jquery.inputmask.js"></script>
 <script type="text/javascript" src="20150515-PhoneTextDropMenu.js"></script>
+<script type="text/javascript">
+	$(window).load(carDeal.init( [{
+			"selector": ".ddText textarea",
+			"lineSeparator": "\n", //Separator between output result line
+			"mustFill": [false,true,false], //Wich fild mast be entered for add next line. Mask mast be for correct work othervise input cheked like true.
+			"lines": [{
+					"head": "Телфон",
+					"mask": { //Mask for fild
+						"mask": "99-aaa",
+						"clearIncomplete": true
+					}
+				},{
+					"head": "Добавочный",
+					"mask": {
+						"mask": "99-99999"
+					}
+				},{
+					"head": "Должность",
+				}]
+			}]
+		)
+	);
+</script>
 </body>
 </html>
