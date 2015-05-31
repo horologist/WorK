@@ -14,7 +14,7 @@
  						"gutter": "4", //Gutter between pole and drop down menu "0" - default
  						"lineSeparator": "; ", //Separator between output result line
  						"fildSeparator": " \\ ", //Separator between output fild
- 						"mustFill": [true,true,false,true,true], //Wich fild mast be entered for add next line. Mask mast be for correct work othervise input cheked like true.
+ 						"mustFill": [true, true], //Wich fild mast be entered for add next line. Mask mast be for correct work othervise input cheked like true.
  						"lines": [{
 	 							"head": "Телфон",
 	 							"tag": "<input>", // Mast be input, but can by a style data inside
@@ -142,6 +142,7 @@
  		function saveDataToEl(data){
 
  			var modal = $(data.currentTarget.closest(".ddModal")),
+ 				param = data.data.data, //The special parametrs wich comes with in data object
  				table = modal.find("tbody"),
  				result = "",
  				key = false;
@@ -149,15 +150,20 @@
  			//Get data from all fild
  			table.find("tr").each(function(j){
  				var length = $(this).find("input").length - 1,
- 					partOfData = "";
+ 					partOfData = "",
+ 					controlMask = false;
+
  				key = true;
  				$(this).find("input").each(function(i){
  					if (i < length) {
- 						partOfData += $(this).val() + data.data.data.fildSeparator;
+ 						partOfData += $(this).val() + param.fildSeparator;
  					} else {
 						partOfData += $(this).val();
  					};
- 					if (!$(this).inputmask("isComplete")) {
+
+ 					controlMask = ( ('mustFill' in param) && (i in param.mustFill) ) ? param.mustFill[i] : false;
+
+ 					if (!$(this).inputmask("isComplete") && controlMask) {
  						key = false;
  					};
  				});
@@ -189,7 +195,13 @@
  						//Copy all mask in mask arr;
  						inpMaskArr[i] = arr[i].mask || null;
 
- 					head.find("tr").append("<th>" + arr[i].head + "</th>");
+ 					//Colored head menu to point requider fild
+ 					if( (('mustFill' in obj) && (i in obj.mustFill)) && obj.mustFill[i]){
+	 					head.find("tr").append('<th style="color:#FF6347">' + arr[i].head + "</th>");
+ 					} else {
+	 					head.find("tr").append("<th>" + arr[i].head + "</th>");
+ 					}
+
 					line.append(el.append(current));
 				};
 				// Add special pole in line
@@ -267,6 +279,7 @@
  			"phoneList": function(event){
 
  				var target = $(event.target),
+ 					data = event.data, //Additional information from main config object
  					position = target.position(),
  					height = target.outerHeight(),
  					gutter = event.data.gutter || 0,
@@ -275,7 +288,8 @@
  					line = tableLine(event.data),//Set template for current pole
  					lineData = getDataFromEl(event);//Get data from curent pole
 
- 				event.currentTarget.blur();
+
+ 				target.blur();
 
 	 			//Add head line position
 	 			container.find("table").prepend(glovar.conTableHead);
@@ -318,6 +332,7 @@
  		return {
 	 		init: function(){
 		 		for (var i = 0, l = glovar.handlers.length; i < l; i++) {
+
 		 			//Add hendler in all elements in the DOM
 		 			if(glovar.handlers[i].active) {
 		 				$(glovar.handlers[i].selector).each( function(){
