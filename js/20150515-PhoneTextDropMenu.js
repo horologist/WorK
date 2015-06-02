@@ -17,6 +17,7 @@ var carDeal = (function(){
 		// 		"lines": [{
 	 // 					"head": "Телфон",
 	 // 					"tag": "<input>", // Mast be input, but can by a style data inside
+	 //						"placeholder":""
 	 // 					"mask": { //Mask for fild
 	 // 						"mask": "99-aaa",
 	 // 						"clearIncomplete": true
@@ -196,6 +197,9 @@ var carDeal = (function(){
 			for (var i = 0; i < lineLength ; i++){
 					var el = $("<td>"),
 						current = $(arr[i].tag || '<input>').data("index", i);
+						if ('placeholder' in arr[i]){
+							current.attr('placeholder', arr[i].placeholder);
+						}
 						//Copy all mask in mask arr;
 						inpMaskArr[i] = arr[i].mask || null;
 
