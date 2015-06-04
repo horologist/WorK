@@ -58,25 +58,33 @@ if( typeof window.eventHandler !== 'function' ) {
 
 var myEvent = eventHandler();
 
-	var iFrame = document.getElementsByTagName('iframe');
+var openDate = document.querySelector('.date-work-open');
+openDate = new Date(openDate.innerHTML);
+var closeDateInput = document.querySelector('.date-work-close');
 
-	console.log(iFrame);
-	iFrame[0].onload = function(){
+function myHandler (){
+  myEvent.removeListener('click', this, myHandler);
+  
+  var target = document.querySelector('.date-work-close td > input');
+  var attr = target.getAttribute('onchange');
+  
+  function changeHandler (){
+    console.log('i am changed');
+    var closeDate = new Date( target.value );
+    if(closeDate != 'Invalid Date'){
+      if(closeDate < openDate){
+        target.value = '';
+        target.setAttribute( 'placeholder', 'Нельзя закрыть этой датой');
+        setTimeout(function(){target.setAttribute( 'placeholder', ''); target.value = 'N';},1000);
+      }
+    } 
+  };
+
+  target.setAttribute('onchange', 'changeHandler();');
+
+  // myEvent.addListener('input',target,function(){
+  // });
+};
 
 
-		var openDate = document.querySelector('.date-work-open');
-		openDate = new Date(openDate.innerHTML);
-		var closeDateInput = document.querySelector('.date-work-close > input');
-		var target = closeDateInput;
-		myEvent.addListener('change',closeDateInput,function(){
-			var closeDate = new Date( target.value );
-			if(closeDate != 'Invalid Date'){
-				if(closeDate < openDate){
-					target.value = '';
-					target.setAttribute( 'placeholder', 'Нельзя закрыть этой датой');
-					setTimeout(function(){target.setAttribute( 'placeholder', ''); target.value = 'N';},1000);
-				}
-			}	
-		});
-
-	};
+myEvent.addListener('click', closeDateInput, myHandler);
