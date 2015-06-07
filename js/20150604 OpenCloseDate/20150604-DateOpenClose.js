@@ -80,7 +80,7 @@ function myHandler (){
     } 
   };
 
-  target.setAttribute('onchange', 'changeHandler();');
+  target.setAttribute('onchange', 'changeHandler();' + attr);
 
   // myEvent.addListener('input',target,function(){
   // });
