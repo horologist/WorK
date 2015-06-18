@@ -11,27 +11,46 @@ $addHandler(window, 'load', function(){
 		elClass = null,
 		father = null;
 
+	if(document.getElementsByClassName) {
+	    getElementsByClass = function(classList, node) {   
+	        return (node || document).getElementsByClassName(classList)
+	    }
+	} else {
+	    getElementsByClass = function(classList, node) {           
+	        var node = node || document,
+	        list = node.getElementsByTagName('*'),
+	        length = list.length, 
+	        classArray = classList.split(/\s+/),
+	        classes = classArray.length,
+	        result = [], i,j
+	        for(i = 0; i < length; i++) {
+	            for(j = 0; j < classes; j++)  {
+	                if(list[i].className.search('\\b' + classArray[j] + '\\b') != -1) {
+	                    result.push(list[i])
+	                    break
+	                }
+	            }
+	        }
+	        return result
+	    }
+	};
+
 	function checkAttachment(){
 
-		specialPole = document.getElementsByTagName('tr');
-
-		for( var n = 0, ln = specialPole.length; n < ln; n++){
-			var temp = specialPole[n].children[0];
-			if(temp && (temp.innerHTML.replace(/(^\s+|\s+$)/g,'') == 'Диагностическая карта:')){
-				controledPole = temp;
-				var current = specialPole[n].children[1].getElementsByTagName('input');
-				if (current[0].value){
-					console.log('ok');
-					button.click();
-					return true;
-				} else {
-					controledPole.style.color = 'red';
-					showMyAllert(controledPole);
-					console.log('bad');
-					return false;
-				};
-			}
-		};
+		specialPole = getElementsByClass('DiagControl', document);
+		var temp = specialPole[0];
+		if(temp){
+			controledPole = temp;
+			var current = temp.parentNode.children[1].getElementsByTagName('input');
+			if (current[0].value){
+				button.click();
+				return true;
+			} else {
+				controledPole.style.color = 'red';
+				showMyAllert(controledPole);
+				return false;
+			};
+		}
 	};
 
 	function findUpContainer(el, id){
@@ -44,11 +63,34 @@ $addHandler(window, 'load', function(){
 
 	function showMyAllert(el){
 		var container = findUpContainer(el,'MSO_ContentTable'),
-			el = document.createElement('div');
+			el = document.createElement('div'),
+			elAl = document.createElement('div'),
+			elClose = document.createElement('a');
 
-			el.setAttribute('style', 'position:absolute;top:0;left:0;right:0;bottom:0;background-color:black;opacity:0.5;');
+		elClose.setAttribute('style', 'width:15px;height:15px;position:absolute;top:15px;right:15px;color:red;border: 1px solid black;text-align:center;border-radius:15px');
+		elClose.setAttribute('href', '#');
+		elClose.innerHTML = 'x';
+		elAl.setAttribute('style', 'width:400px;height:100px;position:absolute;bottom:300px;left:50%;margin-left:-200px;color:red;background-color:#fff;border-radius:5px');
+		elAl.innerHTML = '<span style="height:100px;text-align:center;display:block;line-height:100px;font-size:15px;">Заполните поля выделенные красным цветом</span>';
+		el.setAttribute('style', 'position:absolute;top:0;left:0;right:0;bottom:0;background-color:black;opacity:0.5');
+		elAl.appendChild(elClose);
 
-			container.appendChild(el);
+		container.appendChild(el);
+		container.appendChild(elAl);
+
+		$addHandler(elClose, 'click', function(event){
+
+			event = event || window.event;
+
+			  if (event.preventDefault) { // если метод существует
+			    event.preventDefault(); // то вызвать его
+			  } else { // иначе вариант IE8-:
+			    event.returnValue = false;
+			  }
+
+			el.parentNode.removeChild(el);
+			elAl.parentNode.removeChild(elAl);
+		});
 
 	};
 
