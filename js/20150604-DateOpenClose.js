@@ -9,6 +9,7 @@ $addHandler(window, 'load', function(){
     specialPole = [],
     controledPole = null,
     button = null,
+    buttonSaveUp = null,
     elClass = null,
     father = null,
     closeDate = null;
@@ -90,27 +91,58 @@ function checkDate (){
   var target = closeDateInput[0].firstChild;
 
   if(target.value){
-    closeDate = new Date(+target.value);
+    if (new Date(+target.value) == 'Invalid Date'){
+      closeDate = new Date(1);  
+    } else {
+      closeDate = new Date(+target.value);  
+    }
   }
 
+  console.log(closeDate, openDate);
   if(closeDate <= openDate){
 
     showMyAllert(closeDateInput[0]);
+
     return false;
 
   }else if(closeDate > openDate){
 
     // UNCOMMENT THIS FOR REAL FUNCTIONL
-    // button.click();
-    // return true;
+    button.click();
+    return true;
 
-    console.log('All ok');
+    // console.log('All ok');
   }
 
 };
 
-//Select all input
+  //Select all input
   inputs = document.getElementsByTagName('input');
+  buttonSaveUp = document.getElementById('Ribbon.ListForm.Edit.Commit.Publish-Large');
+
+  //Copy parametrs from needed, hide it, and make own
+  if (buttonSaveUp){
+
+    var el = document.createElement('a'),
+        elContainer = buttonSaveUp.parentNode;
+
+    el.className = buttonSaveUp.className;
+    el.setAttribute('href',buttonSaveUp.getAttribute('href'));
+    el.setAttribute('role', 'button');
+    el.setAttribute('unselectable', 'on');
+    el.innerHTML = buttonSaveUp.innerHTML;
+
+    //Show My button
+    elContainer.insertBefore(el, buttonSaveUp);
+
+    //Hide main button
+    buttonSaveUp.style.display = 'none';
+
+    //Add control handler
+    $addHandler(el, 'click', checkDate);
+
+  }
+
 
   //Copy paametrs from needed input
   for( var i = 0, l = inputs.length; i < l; i++){
