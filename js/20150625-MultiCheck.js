@@ -1,7 +1,7 @@
-//Check file attachment in special fild
+//Check multi parameters
 //
 //Version: 1.00
-//Last Date: 18.06.2015
+//Last Date: 24.06.2015
 
 $addHandler(window, 'load', function(){
 	var inputs = [],
@@ -166,11 +166,13 @@ $addHandler(window, 'load', function(){
 	function subButton(config){
 		var arg = {
 			'id': null, //Main Param - work salfish
-			'tag': null, // Second main param, but if set other param return strict value
+			'tag': null, // Second main param, but if set other param return current of that value
 			'className': null, // Last main param - work with lowest additional params
 			'index': null, //Additional param - can`t use lonely
 			'value': null //Additional param - can`t use lonely
-		};
+		},
+		mainButton = null,
+		myButton = null;
 
 		extendObj(arg, config);
 
@@ -235,6 +237,12 @@ $addHandler(window, 'load', function(){
 
 		return this;
 	}
+
+	//  ||    Upper object for replast SubCode.
+	//  ||
+	//  ||
+	// \  /
+	//  \/
 
 	//Select all input
 	inputs = document.getElementsByTagName('input');
