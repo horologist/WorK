@@ -8,7 +8,7 @@ $(document).ready(function(){
 		this.get = function(){
 			var value = false;
 
-			if (window.localStorage){ //window.localStorage
+			if (window.localStorage){ //window.localStorage  !!!!!!!!!!!!!
 
 				value = this.getLocalStorage(name) || false;
 
@@ -32,7 +32,7 @@ $(document).ready(function(){
 		this.save = function(value){
 			var data = JSON.stringify(value);
 
-			if (window.localStorage) { // /*window.localStorage*/
+			if (window.localStorage) { // /*window.localStorage*/  !!!!!!!!!!!!!!!!!!!!!!!
 				this.setLocalStorage(name, data, expires);
 				return this;
 			} else {
@@ -42,6 +42,10 @@ $(document).ready(function(){
 
 			return false;
 		};
+
+		this.remove = function(name){
+
+		}
 		
 		this.getLocalStorage = function(name){
 			var data = window.localStorage.getItem(name) ? decodeURIComponent(window.localStorage.getItem(name)) : undefined;
@@ -132,7 +136,7 @@ $(document).ready(function(){
 
 	value = ['my array', 1 , 5, [],5,7,8,9,0];
 
-	var myCash = new LocalData('myData', 10);
+	var myCash = new LocalData('myData', 60);
 	// myCash.save(value);
 	console.log(myCash.get());
 
