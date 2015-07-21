@@ -11,7 +11,16 @@ $addHandler(window, 'load', function(){
 		button = null, //Нижняя кнопка сохранить
 		buttonSaveUp = null, //Верхняя кнопка сохранить.
 		elClass = null,
-		father = null;
+		father = null,
+		filds = {
+			'id':{
+
+			},
+			'tagClass':{
+				'selectBar': 'OrderStatus',
+				'PTSs': 'PTSFilds'
+			}
+		};
 
 	if(document.getElementsByClassName) {
 	    getElementsByClass = function(classList, node) {   
@@ -38,18 +47,21 @@ $addHandler(window, 'load', function(){
 	};
 
 	function checkInfoPole(){
-	        var status = getElementsByClass('OrderStatus', document)[0],
+	        var status = getElementsByClass(filds.tagClass.selectBar, document)[0],
 		    statusCurent = status.parentNode.children[1].getElementsByTagName('input')[1].value,
 		    saveKey = false;
 		
 		if (statusCurent){
 			switch (statusCurent) {
+			  case 'Получены':
+			  	showPTS(true);
+			  break;
 			  case 'Завершена работа по заявке':
 			    saveKey = checkDiagMap();
-			  break
+			  break;
 			  default:
 			    saveKey = true;
-			  break
+			  break;
 			}
 		};
 		
@@ -91,6 +103,18 @@ $addHandler(window, 'load', function(){
 		    };
 		  };
 		  return false;
+		};
+
+		//Отображает поля с заданным классом filds.tagClass.PTSs
+		function showPTS(option){
+			console.log('my day');
+			var filds = getElementsByClass(filds.tagClass.PTSs, document),
+				option = option ? '' : 'none';
+			if (filds.length > 0){
+				for (var i = 0, l = filds.length; i < l; i++){
+					filds[i].style.display = option;
+				};
+			};
 		};
 
 	};
@@ -192,5 +216,13 @@ $addHandler(window, 'load', function(){
 		$addHandler(el, 'click', checkInfoPole);
 	};
 
+	//Навешиваем обработчик события на именение статуса
+	var status = getElementsByClass(filds.tagClass.selectBar, document)[0],
+		statusBar = status.parentNode.children[1].getElementsByTagName('input')[1];
+
+	if (statusBar){
+		console.log(statusBar);
+		$addHandler(statusBar, 'change', checkInfoPole);		
+	}
 
 });
