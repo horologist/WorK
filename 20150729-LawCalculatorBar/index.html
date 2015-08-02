@@ -3,10 +3,12 @@
 <head>
 	<title>Law Calculator Bar</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<script type="text/javascript" src="js/angular.js"></script>
+	<script type="text/javascript" src="js/app.js"></script>
 </head>
 <body>
 
-<div id="inner">
+<div ng-app="receipt">
 	<div id="content_inner">
 		<div id="system-message-container"></div>
 		<div class="item-page">
@@ -130,359 +132,41 @@
 			<p style="text-align: justify;">Внимание! Реквизиты, заполненные в квитанции по умолчанию являются демонстративными и не подходят для уплаты госпошлины!</p>
 			<p style="text-align: justify;">При заполнении квитанции, введите реквизиты суда, в который вы будете <a href="/articles/sroki-podachi-iskovogo-zayavleniya">подавать заявление</a>.</p>
 
-		<!-- START: Modules Anywhere -->
-			<script type="text/javascript">
-				 var FIELDPOLUCHATEL= Array();
-				 var FIELDKPP = Array();
-				 var FIELDINN = Array();
-				 var FIELDOKATO  = Array();
-				 var FIELDSCHET  = Array();
-				 var FIELDUCHREJDENIE  = Array();
-				 var FIELDKBK = Array();
-				 var FIELDADRESS = Array();
-			FIELDPOLUCHATEL[3] = 'УФК по г. Москве (ИФНС России № 16 по г.Москве )';
-			FIELDKPP[3] = '771601001';
-			FIELDINN[3] = '7716103458';
-			FIELDOKATO[3] = '45351000';
-			FIELDSCHET[3] = '40101810800000010041';
-			FIELDUCHREJDENIE[3] = 'Отделение 1 Москва';
-			FIELDKBK[3] = '18210803010011000110';
-			FIELDADRESS[3] = 'Бабушкинский районный суд г. Москвы';
-			FIELDPOLUCHATEL[5] = 'УФК по г. Москве (ИФНС России № 8 по г.Москве )';
-			FIELDKPP[5] = '770801001';
-			FIELDINN[5] = '7708034472';
-			FIELDOKATO[5] = '45378000';
-			FIELDSCHET[5] = '40101810800000010041';
-			FIELDUCHREJDENIE[5] = 'Отделение 1 Москва';
-			FIELDKBK[5] = '18210803010011000110';
-			FIELDADRESS[5] = 'Басманный районный суд г. Москвы';
-			FIELDPOLUCHATEL[4] = 'УФК по г. Москве (ИФНС России № 13 по г.Москве )';
-			FIELDKPP[4] = '771501001';
-			FIELDINN[4] = '7713034630';
-			FIELDOKATO[4] = '45346000';
-			FIELDSCHET[4] = '40101810800000010041';
-			FIELDUCHREJDENIE[4] = 'УФК МФ РФ по г. Москве';
-			FIELDKBK[4] = '18210803010011000110';
-			FIELDADRESS[4] = 'Бутырский районный суд г. Москвы';
-			FIELDPOLUCHATEL[2] = 'УФК по г. Москве (ИФНС России № 6 по г.Москве )';
-			FIELDKPP[2] = '770601001';
-			FIELDINN[2] = '7706044740';
-			FIELDOKATO[2] = '45384000';
-			FIELDSCHET[2] = '40101810800000010041';
-			FIELDUCHREJDENIE[2] = 'УФК МФ РФ по г. Москве';
-			FIELDKBK[2] = '18210803010011000110';
-			FIELDADRESS[2] = 'Гагаринский районный суд г. Москвы';
-			FIELDPOLUCHATEL[1] = 'УФК по г. Москве (ИФНС России № 43 по г.Москве )';
-			FIELDKPP[1] = '774301001';
-			FIELDINN[1] = '7743777777';
-			FIELDOKATO[1] = '45341000';
-			FIELDSCHET[1] = '40101810800000010041';
-			FIELDUCHREJDENIE[1] = 'УФК МФ РФ по г. Москве';
-			FIELDKBK[1] = '18210803010011000110';
-			FIELDADRESS[1] = 'Головинский районный суд г. Москвы';
-			FIELDPOLUCHATEL[6] = 'УФК по г. Москве (ИФНС России № 30 по г.Москве )';
-			FIELDKPP[6] = '773001001';
-			FIELDINN[6] = '7730057570';
-			FIELDOKATO[6] = '45318000';
-			FIELDSCHET[6] = '40101810800000010041';
-			FIELDUCHREJDENIE[6] = 'УФК МФ РФ по г. Москве';
-			FIELDKBK[6] = '18210803010011000110';
-			FIELDADRESS[6] = 'Дорогомиловский районный суд г. Москвы';
-			FIELDPOLUCHATEL[7] = 'УФК по г. Москве (ИФНС России № 5 по г.Москве )';
-			FIELDKPP[7] = '770501001';
-			FIELDINN[7] = '7705045236';
-			FIELDOKATO[7] = '45376000';
-			FIELDSCHET[7] = '40101810800000010041';
-			FIELDUCHREJDENIE[7] = 'УФК МФ РФ по г. Москве';
-			FIELDKBK[7] = '18210803010011000110';
-			FIELDADRESS[7] = 'Замоскворецкий районный суд г. Москвы';
-			FIELDPOLUCHATEL[8] = 'УФК по г. Москве (ИФНС России № 35 по г.Москве )';
-			FIELDKPP[8] = '773501001';
-			FIELDINN[8] = '7735071603';
-			FIELDOKATO[8] = '45330000';
-			FIELDSCHET[8] = '40101810800000010041';
-			FIELDUCHREJDENIE[8] = 'УФК МФ РФ по г. Москве';
-			FIELDKBK[8] = '18210803010011000110';
-			FIELDADRESS[8] = 'Зеленоградский районный суд г. Москвы';
-			FIELDPOLUCHATEL[9] = 'УФК по г. Москве (ИФНС России № 27 по г.Москве )';
-			FIELDKPP[9] = '772701001';
-			FIELDINN[9] = '7727092173';
-			FIELDOKATO[9] = '45397000';
-			FIELDSCHET[9] = '40101810800000010041';
-			FIELDUCHREJDENIE[9] = 'УФК МФ РФ по г. Москве';
-			FIELDKBK[9] = '18210803010011000110';
-			FIELDADRESS[9] = 'Зюзинский районный суд г. Москвы';
-			FIELDPOLUCHATEL[10] = 'УФК по г. Москве (ИФНС России № 1 по г.Москве )';
-			FIELDKPP[10] = '770901001';
-			FIELDINN[10] = '7701107259';
-			FIELDOKATO[10] = '45375000';
-			FIELDSCHET[10] = '40101810800000010041';
-			FIELDUCHREJDENIE[10] = 'Отделение 1 Москва';
-			FIELDKBK[10] = '18210803010011000110';
-			FIELDADRESS[10] = 'Измайловский районный суд г. Москвы';
-			FIELDPOLUCHATEL[11] = 'УФК по г. Москве (ИФНС России № 43 по г.Москве )';
-			FIELDKPP[11] = '774301001';
-			FIELDINN[11] = '7743777777';
-			FIELDOKATO[11] = '45341000';
-			FIELDSCHET[11] = '40101810800000010041';
-			FIELDUCHREJDENIE[11] = 'УФК МФ РФ по г. Москве';
-			FIELDKBK[11] = '18210803010011000110';
-			FIELDADRESS[11] = 'Коптевский районный суд г. Москвы';
-			FIELDPOLUCHATEL[12] = 'УФК по г. Москве (ИФНС России № 21 по г.Москве )';
-			FIELDKPP[12] = '772101001';
-			FIELDINN[12] = '7721049904';
-			FIELDOKATO[12] = '45394000';
-			FIELDSCHET[12] = '40101810800000010041';
-			FIELDUCHREJDENIE[12] = 'Отделение 1 Москва';
-			FIELDKBK[12] = '18210803010011000110';
-			FIELDADRESS[12] = 'Кузьминский районный суд г. Москвы';
-			FIELDPOLUCHATEL[13] = 'УФК по г. Москве (ИФНС России № 31 по г.Москве )';
-			FIELDKPP[13] = '773101001';
-			FIELDINN[13] = '7731154880';
-			FIELDOKATO[13] = '45320000';
-			FIELDSCHET[13] = '40101810800000010041';
-			FIELDUCHREJDENIE[13] = 'УФК МФ РФ по г. Москве';
-			FIELDKBK[13] = '18210803010011000110';
-			FIELDADRESS[13] = 'Кунцевский районный суд г. Москвы';
-			FIELDPOLUCHATEL[14] = 'УФК по г. Москве (ИФНС России № 9 по г.Москве )';
-			FIELDKPP[14] = '772201001';
-			FIELDINN[14] = '7709000010';
-			FIELDOKATO[14] = '45381000';
-			FIELDSCHET[14] = '40101810800000010041';
-			FIELDUCHREJDENIE[14] = 'УФК МФ РФ по г. Москве';
-			FIELDKBK[14] = '18210803010011000110';
-			FIELDADRESS[14] = 'Лефортовский районный суд г. Москвы';
-			FIELDPOLUCHATEL[16] = 'УФК по г. Москве (ИФНС России № 23 по г.Москве )';
-			FIELDKPP[16] = '772301001';
-			FIELDINN[16] = '7723013452';
-			FIELDOKATO[16] = '45389000';
-			FIELDSCHET[16] = '40101810800000010041';
-			FIELDUCHREJDENIE[16] = 'УФК МФ РФ по г. Москве';
-			FIELDKBK[16] = '18210803010011000110';
-			FIELDADRESS[16] = 'Люблинский районный суд г. Москвы';
-			FIELDPOLUCHATEL[15] = 'УФК по г. Москве (ИФНС России № 8 по г.Москве )';
-			FIELDKPP[15] = '770801001';
-			FIELDINN[15] = '7708034472';
-			FIELDOKATO[15] = '45378000';
-			FIELDSCHET[15] = '40101810800000010041';
-			FIELDUCHREJDENIE[15] = 'Отделение 1 Москва';
-			FIELDKBK[15] = '18210803010011000110';
-			FIELDADRESS[15] = 'Мещанский районный суд г. Москвы';
-			FIELDPOLUCHATEL[17] = 'УФК по г. Москве (ИФНС России № 24 по г.Москве )';
-			FIELDKPP[17] = '772401001';
-			FIELDINN[17] = '7724111558';
-			FIELDOKATO[17] = '45918000';
-			FIELDSCHET[17] = '40101810800000010041';
-			FIELDUCHREJDENIE[17] = 'УФК МФ РФ по г. Москве';
-			FIELDKBK[17] = '18210803010011000110';
-			FIELDADRESS[17] = 'Нагатинский районный суд г. Москвы';
-			FIELDPOLUCHATEL[18] = 'УФК по г. Москве (ИФНС России № 29 по г.Москве )';
-			FIELDKPP[18] = '772901001';
-			FIELDINN[18] = '7729150007';
-			FIELDOKATO[18] = '45325000';
-			FIELDSCHET[18] = '40101810800000010041';
-			FIELDUCHREJDENIE[18] = 'УФК МФ РФ по г. Москве';
-			FIELDKBK[18] = '18210803010011000110';
-			FIELDADRESS[18] = 'Никулинский районный суд г. Москвы';
-			FIELDPOLUCHATEL[19] = 'УФК МФ по г. Москве (ИФНС России № 17 г. Москвы)';
-			FIELDKPP[19] = '771701001';
-			FIELDINN[19] = '7717018935';
-			FIELDOKATO[19] = '45358000';
-			FIELDSCHET[19] = '40101810800000010041';
-			FIELDUCHREJDENIE[19] = 'Отделение 1 Москва';
-			FIELDKBK[19] = '18210803010011000110';
-			FIELDADRESS[19] = 'Останкинский районный суд г. Москвы';
-			FIELDPOLUCHATEL[20] = 'УФК по г. Москве (ИФНС России № 20 по г.Москве )';
-			FIELDKPP[20] = '772001001';
-			FIELDINN[20] = '7720143220';
-			FIELDOKATO[20] = '45312000';
-			FIELDSCHET[20] = '40101810800000010041';
-			FIELDUCHREJDENIE[20] = 'Отделение 1 Москва';
-			FIELDKBK[20] = '18210803010011000110';
-			FIELDADRESS[20] = 'Перовский районный суд г. Москвы';
-			FIELDPOLUCHATEL[21] = 'УФК по г. Москве (ИФНС России № 18 по г.Москве )';
-			FIELDKPP[21] = '771801001';
-			FIELDINN[21] = '7718111790';
-			FIELDOKATO[21] = '45316000';
-			FIELDSCHET[21] = '40101810800000010041';
-			FIELDUCHREJDENIE[21] = 'Отделение 1 Москва';
-			FIELDKBK[21] = '18210803010011000110';
-			FIELDADRESS[21] = 'Преображенский районный суд г. Москвы';
-			FIELDPOLUCHATEL[22] = 'УФК по г. Москве (ИФНС России № 3 по г.Москве )';
-			FIELDKPP[22] = '770301001';
-			FIELDINN[22] = '7703037470';
-			FIELDOKATO[22] = '45380000';
-			FIELDSCHET[22] = '40101810800000010041';
-			FIELDUCHREJDENIE[22] = 'УФК МФ РФ по г. Москве';
-			FIELDKBK[22] = '18210803010011000110';
-			FIELDADRESS[22] = 'Пресненский районный суд г. Москвы';
-			FIELDPOLUCHATEL[23] = 'УФК по г. Москве (ИФНС России № 10 по г.Москве )';
-			FIELDKPP[23] = '771001001';
-			FIELDINN[23] = '7710047253';
-			FIELDOKATO[23] = '45382000';
-			FIELDSCHET[23] = '40101810800000010041';
-			FIELDUCHREJDENIE[23] = 'УФК МФ РФ по г. Москве';
-			FIELDKBK[23] = '18210803010011000110';
-			FIELDADRESS[23] = 'Савеловский районный суд г. Москвы';
-			FIELDPOLUCHATEL[24] = 'УФК по г. Москве (ИФНС России № 25 по г.Москве )';
-			FIELDKPP[24] = ' 772501001';
-			FIELDINN[24] = '7725068979';
-			FIELDOKATO[24] = '45914000';
-			FIELDSCHET[24] = '40101810800000010041';
-			FIELDUCHREJDENIE[24] = 'Отделение 1 Москва';
-			FIELDKBK[24] = '18210803010011000110';
-			FIELDADRESS[24] = 'Симоновский районный суд г. Москвы';
-			FIELDPOLUCHATEL[25] = 'УФК МФ РФ по г. Москве (ИФНС России № 29 по г.Москве)';
-			FIELDKPP[25] = '772901001';
-			FIELDINN[25] = '7729150007';
-			FIELDOKATO[25] = '45326000';
-			FIELDSCHET[25] = '40101810800000010041';
-			FIELDUCHREJDENIE[25] = 'Отделение 1 Москва';
-			FIELDKBK[25] = '18210803010011000110';
-			FIELDADRESS[25] = 'Солнцевский районный суд г. Москвы';
-			FIELDPOLUCHATEL[26] = 'УФК по г. Москве (ИФНС России № 9 по г.Москве )';
-			FIELDKPP[26] = '770901001';
-			FIELDINN[26] = '7709000010';
-			FIELDOKATO[26] = '45381000';
-			FIELDSCHET[26] = '40101810800000010041';
-			FIELDUCHREJDENIE[26] = 'УФК МФ РФ по г. Москве';
-			FIELDKBK[26] = '18210803010011000110';
-			FIELDADRESS[26] = 'Таганский районный суд г. Москвы';
-			FIELDPOLUCHATEL[27] = 'УФК по г. Москве (ИФНС России № 7 по г.Москве )';
-			FIELDKPP[27] = '770701001';
-			FIELDINN[27] = '7707081688';
-			FIELDOKATO[27] = '45382000';
-			FIELDSCHET[27] = '40101810800000010041';
-			FIELDUCHREJDENIE[27] = 'УФК МФ РФ по г. Москве';
-			FIELDKBK[27] = '18210803010011000110';
-			FIELDADRESS[27] = 'Тверской районный суд г. Москвы';
-			FIELDPOLUCHATEL[28] = 'УФК по г. Москве (ИФНС России № 13 по г.Москве )';
-			FIELDKPP[28] = '771301001';
-			FIELDINN[28] = '7713034630';
-			FIELDOKATO[28] = '45346000';
-			FIELDSCHET[28] = '40101810800000010041';
-			FIELDUCHREJDENIE[28] = 'Отделение 1 Москва';
-			FIELDKBK[28] = '18210803010011000110';
-			FIELDADRESS[28] = 'Тимирязевский районный суд г. Москвы';
-			FIELDPOLUCHATEL[29] = 'УФК по г. Москве (ИФНС России № 33 по г.Москве )';
-			FIELDKPP[29] = '773301001';
-			FIELDINN[29] = '7733053334';
-			FIELDOKATO[29] = '45368000';
-			FIELDSCHET[29] = '40101810800000010041';
-			FIELDUCHREJDENIE[29] = 'УФК МФ РФ по г. Москве';
-			FIELDKBK[29] = '18210803010011000110';
-			FIELDADRESS[29] = 'Тушинский районный суд г. Москвы';
-			FIELDPOLUCHATEL[31] = 'УФК по г. Москве (ИФНС России № 4 по г.Москве )';
-			FIELDKPP[31] = '770401001';
-			FIELDINN[31] = '7704058987';
-			FIELDOKATO[31] = '45383000';
-			FIELDSCHET[31] = '40101810800000010041';
-			FIELDUCHREJDENIE[31] = 'УФК МФ РФ по г. Москве';
-			FIELDKBK[31] = '18210803010011000110';
-			FIELDADRESS[31] = 'Хамовнический районный суд г. Москвы';
-			FIELDPOLUCHATEL[32] = 'УФК по г. Москве (ИФНС России № 34 по г.Москве )';
-			FIELDKPP[32] = '773401001';
-			FIELDINN[32] = '7734110842';
-			FIELDOKATO[32] = '45371000';
-			FIELDSCHET[32] = '40101810800000010041';
-			FIELDUCHREJDENIE[32] = 'УФК МФ РФ по г. Москве';
-			FIELDKBK[32] = '18210803010011000110';
-			FIELDADRESS[32] = 'Хорошевский районный суд г. Москвы';
-			FIELDPOLUCHATEL[30] = 'УФК по г. Москве (ИФНС России № 27 по г.Москве )';
-			FIELDKPP[30] = '772701001';
-			FIELDINN[30] = '7727092173';
-			FIELDOKATO[30] = '45397000';
-			FIELDSCHET[30] = '40101810800000010041';
-			FIELDUCHREJDENIE[30] = 'УФК МФ РФ по г. Москве';
-			FIELDKBK[30] = '18210803010011000110';
-			FIELDADRESS[30] = 'Черемушкинский районный суд г. Москвы';
-			FIELDPOLUCHATEL[33] = 'УФК по г. Москве (ИФНС России № 26 по г.Москве )';
-			FIELDKPP[33] = '772601001';
-			FIELDINN[33] = '7726062105';
-			FIELDOKATO[33] = '45920000';
-			FIELDSCHET[33] = '40101810800000010041';
-			FIELDUCHREJDENIE[33] = 'УФК МФ РФ по г. Москве';
-			FIELDKBK[33] = '18210803010011000110';
-			FIELDADRESS[33] = 'Чертановский районный суд г. Москвы';
-			FIELDPOLUCHATEL[34] = 'УФК МФ по г. Москве (ИФНС России № 24 г. Москвы)';
-			FIELDKPP[34] = '772401001';
-			FIELDINN[34] = '7724111558';
-			FIELDOKATO[34] = '45918000';
-			FIELDSCHET[34] = '40101810800000010041';
-			FIELDUCHREJDENIE[34] = 'Отделение 1 Москва';
-			FIELDKBK[34] = '18210803010011000110';
-			FIELDADRESS[34] = 'Щербинский районный суд г. Москвы';
-			</script>
-			<script type="text/javascript" src="/modules/mod_kvitancia_module/helpers/script.js"></script>
 
-			<form id="kvitanciaform" action="/modules/mod_kvitancia_module/kvitancia_vsemvsud.ru.doc" onsubmit="return check_form();">
+			<form name="kvitanciya" id="kvitanciaform" ng-controller="CourtsOfLaw as courts" novalidate>
 				<div id="msg"></div>
 				<table width="100%" border="0" id="kvitanciatable">
 					<tbody><tr>
 						<td width="250px">Наименование получателя:</td>
 						<td>
-							<select name="rajon_choice" id="rajon_choice" onchange="show_sud();">
-								<option value="">Выберите районный суд...</option>
-								<option value="3">Бабушкинский районный суд г. Москвы</option>
-								<option value="5">Басманный районный суд г. Москвы</option>
-								<option value="4">Бутырский районный суд г. Москвы</option>
-								<option value="2">Гагаринский районный суд г. Москвы</option>
-								<option value="1">Головинский районный суд г. Москвы</option>
-								<option value="6">Дорогомиловский районный суд г. Москвы</option>
-								<option value="7">Замоскворецкий районный суд г. Москвы</option>
-								<option value="8">Зеленоградский районный суд г. Москвы</option>
-								<option value="9">Зюзинский районный суд г. Москвы</option>
-								<option value="10">Измайловский районный суд г. Москвы</option>
-								<option value="11">Коптевский районный суд г. Москвы</option>
-								<option value="12">Кузьминский районный суд г. Москвы</option>
-								<option value="13">Кунцевский районный суд г. Москвы</option>
-								<option value="14">Лефортовский районный суд г. Москвы</option>
-								<option value="16">Люблинский районный суд г. Москвы</option>
-								<option value="15">Мещанский районный суд г. Москвы</option>
-								<option value="17">Нагатинский районный суд г. Москвы</option>
-								<option value="18">Никулинский районный суд г. Москвы</option>
-								<option value="19">Останкинский районный суд г. Москвы</option>
-								<option value="20">Перовский районный суд г. Москвы</option>
-								<option value="21">Преображенский районный суд г. Москвы</option>
-								<option value="22">Пресненский районный суд г. Москвы</option>
-								<option value="23">Савеловский районный суд г. Москвы</option>
-								<option value="24">Симоновский районный суд г. Москвы</option>
-								<option value="25">Солнцевский районный суд г. Москвы</option>
-								<option value="26">Таганский районный суд г. Москвы</option>
-								<option value="27">Тверской районный суд г. Москвы</option>
-								<option value="28">Тимирязевский районный суд г. Москвы</option>
-								<option value="29">Тушинский районный суд г. Москвы</option>
-								<option value="31">Хамовнический районный суд г. Москвы</option>
-								<option value="32">Хорошевский районный суд г. Москвы</option>
-								<option value="30">Черемушкинский районный суд г. Москвы</option>
-								<option value="33">Чертановский районный суд г. Москвы</option>
-								<option value="34">Щербинский районный суд г. Москвы</option>
+							<select ng-model="printedCourt" ng-options="court as court.adress for court in courts.allCourts track by court.id" name="rajon_choice" id="rajon_choice" >
+							<option value="">Выберите районный суд ...</option>
 							</select>
 							<input name="FIELDPOLUCHATEL" type="hidden" id="FIELDPOLUCHATEL" value="УФК МФ РФ по Г. Москве" size="40">
 						</td>
 					</tr>
 					<tr>
 						<td>КПП:</td>
-						<td><input name="FIELDKPP" type="text" id="FIELDKPP" size="100" readonly="readonly" class="readonly"></td>
+						<td><input name="KPP" type="text" id="KPP" size="100" readonly="readonly" class="readonly" ng-value="printedCourt.kpp"></td>
 					</tr>
 					<tr>
 						<td>ИНН</td>
-						<td><input name="FIELDINN" type="text" id="FIELDINN" size="100" readonly="readonly" class="readonly"></td>
+						<td><input name="FIELDINN" type="text" id="FIELDINN" size="100" readonly="readonly" class="readonly" ng-value="printedCourt.inn"></td>
 					</tr>
 					<tr>
 						<td>Код ОКТМО</td>
 						<td>
-							<input name="FIELDOKATO" type="text" id="FIELDOKATO" size="100" readonly="readonly" class="readonly" style="display: block;">
+							<input name="FIELDOKATO" type="text" id="FIELDOKATO" size="100" readonly="readonly" class="readonly" style="display: block;" ng-value="printedCourt.okato">
 							<select id="FIELDOKATO_2" style="display: none;"></select>
 						</td>
 					</tr>
 					<tr>
 						<td>Номер счета получателя платежа</td>
-						<td><input name="FIELDSCHET" type="text" id="FIELDSCHET" size="100" readonly="readonly" class="readonly"></td>
+						<td><input name="FIELDSCHET" type="text" id="FIELDSCHET" size="100" readonly="readonly" class="readonly" ng-value="printedCourt.schet"></td>
 					</tr>
 					<tr>
 						<td>Наименование Банка</td>
-						<td><input name="FIELDUCHREJDENIE" type="text" id="FIELDUCHREJDENIE" size="100" readonly="readonly" class="readonly"></td>
+						<td><input name="FIELDUCHREJDENIE" type="text" id="FIELDUCHREJDENIE" size="100" readonly="readonly" class="readonly" ng-value="printedCourt.ucherejdenie"></td>
 					</tr>
 					<tr>
 						<td>БИК</td>
@@ -494,15 +178,15 @@
 					</tr>
 					<tr>
 						<td>Код бюджетной классификации (КБК)</td>
-						<td><input name="FIELDKBK" type="text" id="FIELDKBK" value="18210803010011000110" size="100" readonly="readonly" class="readonly"></td>
+						<td><input name="FIELDKBK" type="text" id="FIELDKBK" value="18210803010011000110" size="100" readonly="readonly" class="readonly" ng-value="printedCourt.kbk"></td>
 					</tr>
 				 	<tr>
 						<td>ФИО плательщика<span class="red">*</span></td>
-						<td><input name="FIELDFIO" type="text" id="FIELDFIO" size="100"></td>
+						<td><input name="FIELDFIO" type="text" id="FIELDFIO" size="100" require></td>
 					</tr>
 					<tr>
 						<td>Адрес Плательшика<span class="red">*</span></td>
-						<td><input name="FIELDADRESS" type="text" id="FIELDADRESS" size="100"></td>
+						<td><input name="FIELDADRESS" type="text" id="FIELDADRESS" size="100" require></td>
 					</tr>
 					<tr>
 				  		<td>Дата</td>
@@ -515,7 +199,7 @@
 				</tbody></table>
 				<br>
 				<div align="center">
-					<input type="submit" name="Рассчитать" id="Рассчитать" value="Скачать заполненную квитанцию">
+					<input type="submit" name="Рассчитать" id="Рассчитать" value="Скачать заполненную квитанцию" ng-submit="kvitanciya.$valid">
 				</div>
 			</form>
 			<script type="text/javascript">
