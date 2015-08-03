@@ -3,6 +3,12 @@
 
 	myApp.controller('CourtsOfLaw', function($scope){
 		this.allCourts = courtsData;
+		this.userInput = {
+			date: new Date(),
+			name: null,
+			adress: null,
+			summ: null
+			}
 
 		$scope.printedCourt = {};
 	});
