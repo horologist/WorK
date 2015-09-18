@@ -1,0 +1,80 @@
+		<div class="item-page">
+			<h1>Выписать квитанцию</h1>
+			<p style="text-align: center;"><strong>Оформить квитанцию для уплаты госопшлины</strong></p>
+			<p style="text-align: justify;">На настоящей странице Вы можете оформить квитанцию для <a href="/kalkylyator-gosposhlini">оплаты госпошлины</a> и распечатать ее для последующей оплаты.</p>
+			<p style="text-align: justify;">Для этого, Вам нужно заполнить все поля, расположенные ниже и нажать кнопку "скачать заполненную квитанцию".</p>
+			<p style="text-align: justify;">Внимание! Реквизиты, заполненные в квитанции по умолчанию являются демонстративными и не подходят для уплаты госпошлины!</p>
+			<p style="text-align: justify;">При заполнении квитанции, введите реквизиты суда, в который вы будете <a href="/articles/sroki-podachi-iskovogo-zayavleniya">подавать заявление</a>.</p>
+
+
+			<form name="kvitanciya" ng-controller="CourtsOfLaw as courts" ng-submit="submit()" novalidate>
+				<table width="100%" border="0">
+					<tbody><tr>
+						<td width="250px">Наименование получателя:</td>
+						<td>
+							<select ng-model="printedCourt"
+									ng-options="court as court.adress for court in courts.allCourts track by court.id"
+									name="rajon_choice" 
+									required>
+							<option value="">Выберите районный суд ...</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td>КПП:</td>
+						<td><input name="KPP" type="text" size="100" readonly="readonly" class="readonly" ng-value="printedCourt.kpp"></td>
+					</tr>
+					<tr>
+						<td>ИНН</td>
+						<td><input name="FIELDINN" type="text" size="100" readonly="readonly" class="readonly" ng-value="printedCourt.inn"></td>
+					</tr>
+					<tr>
+						<td>Код ОКТМО</td>
+						<td>
+							<input name="FIELDOKATO" type="text" size="100" readonly="readonly" class="readonly" style="display: block;" ng-value="printedCourt.okato">
+						</td>
+					</tr>
+					<tr>
+						<td>Номер счета получателя платежа</td>
+						<td><input name="FIELDSCHET" type="text" size="100" readonly="readonly" class="readonly" ng-value="printedCourt.schet"></td>
+					</tr>
+					<tr>
+						<td>Наименование Банка</td>
+						<td><input name="FIELDUCHREJDENIE" type="text" size="100" readonly="readonly" class="readonly" ng-value="printedCourt.ucherejdenie"></td>
+					</tr>
+					<tr>
+						<td>БИК</td>
+						<td><input name="FIELDBIK" type="text" value="044583001" size="100" readonly="readonly" class="readonly"></td>
+					</tr>
+					<tr>
+						<td>Наименование платежа</td>
+						<td><input name="FIELDVIDPLATEJA" type="text" value="Госпошлина" size="100" readonly="readonly" class="readonly"></td>
+					</tr>
+					<tr>
+						<td>Код бюджетной классификации (КБК)</td>
+						<td><input name="FIELDKBK" type="text" size="100" readonly="readonly" class="readonly" ng-value="printedCourt.kbk"></td>
+					</tr>
+				 	<tr>
+						<td>ФИО плательщика<span class="red">*</span></td>
+						<td><input name="FIELDFIO" type="text" size="100" ng-model="courts.userInput.name" required></td>
+					</tr>
+					<tr>
+						<td>Адрес Плательшика<span class="red">*</span></td>
+						<td><input name="FIELDADRESS" type="text" size="100" ng-model="courts.userInput.adress" required></td>
+					</tr>
+					<tr>
+				  		<td>Дата</td>
+						<td><input name="FIELDDATE" type="text" size="30" ng-value="courts.userInput.date | date:'dd.MM.yyyy г.'" required></td>
+					</tr>
+					<tr>
+						<td>Сумма<span class="red">*</span></td>
+						<td><input name="FIELDSUMM" type="number" size="30" ng-model="courts.userInput.summ" required></td>
+					</tr>
+				</tbody></table>
+				<br>
+				<div align="center">
+					<input type="submit" name="Рассчитать" value="Скачать заполненную квитанцию">
+				</div>
+			</form>
+			<!-- END: Modules Anywhere -->
+		</div>

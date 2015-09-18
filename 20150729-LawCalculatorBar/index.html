@@ -4,218 +4,25 @@
 	<title>Law Calculator Bar</title>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<script type="text/javascript" src="js/angular.js"></script>
+	<script type="text/javascript" src="js/angular-ui-router.js"></script>
 	<script type="text/javascript" src="js/app.js"></script>
+	<script type="text/javascript" src="js/docxtemplater-latest.min.js"></script>
+	<script type="text/javascript" src="js/FileSaver.min.js"></script>
+	<script type="text/javascript" src="js/jszip-utils.min.js"></script>
+	<!--
+	Mandatory in IE 6, 7, 8 and 9.
+	-->
+	<!--[if IE]>
+	<script type="text/javascript" src="dist/jszip-utils-ie.min.js"></script>
+	<![endif]-->
 	<link rel="stylesheet" type="text/css" href="css/blank.css">
 </head>
 <body>
 
-<div ng-app="receipt">
+<div ng-app="receiptApp">
 	<div id="content_inner">
 		<div id="system-message-container"></div>
-		<div class="item-page">
-			<h1>Калькулятор госпошлины в суд</h1>
-			<p style="text-align: justify;"><strong><span style="font-size: 18px;">Внимание! Настоящий </span></strong><a href="/kalkylyator-gosposhlini"><strong><span style="font-size: 18px;">к<span style="display: none;">&nbsp;</span>алькулятор госпошлин<span style="display: none;">&nbsp;</span>ы</span></strong></a><strong><span style="font-size: 18px;"> создан на основе последних изменений в законодательства и является актуальным на сегодняшний день</span></strong>
-			</p>
-			<p><em><span style="font-size: 16px;"><span style="font-family: arial,helvetica,sans-serif;">Если вы требуете деньги или имущество, которое подлежит оценке, введите сумму иска для расчета госпошлины!</span></span></em></p>
-			<p><em><span style="font-size: 16px;"><span style="font-family: arial,helvetica,sans-serif;">Для всех остальных видов требований введите выберите вид госпошлины, щелкнув по калькулятору!</span></span></em></p>
-<!-- START: Modules Anywhere -->
-			<form id="calcform" action="/kvitancia">
-				<div id="round_div">
-					<label id="variant1" class="selected_class" style="display: block;">
-						<input name="type" type="radio" id="type" value="1" checked="checked">
-						1) Исковое заявление имущественного характера. <strong>Сумма иска, рублей:</strong>
-						<input name="amount" type="text" id="amount" onchange="calc();" onkeyup="calc();" value="0" size="12">
-					</label>
-					<label id="variant2" class="" style="display: none;">
-						<input type="radio" name="type" id="type" value="2">
-						2) Заявления о вынесении судебного приказа (100 р.)
-					</label>
-					<label id="variant3" class="" style="display: none;">
-						<input type="radio" name="type" id="type" value="3">
-						3) Исковое заявление имущественного характера, не подлежащего оценке, а также исковое заявление неимущественного характера (200 р.)
-					</label>
-					<label id="variant4" class="" style="display: none;">
-						<input type="radio" name="type" id="type" value="4">
-						4) Подача надзорной жалобы (200 р.)
-					</label>
-					<label id="variant5" class="" style="display: none;">
-						<input type="radio" name="type" id="type" value="5">
-						5) Заявление о расторжении брака (400 р.)
-					</label>
-					<label id="variant6" class="" style="display: none;">
-						<input type="radio" name="type" id="type" value="6">
-						6) Заявление об оспаривании (полностью или частично) нормативных правовых актов органов государственной власти, органов местного самоуправления или должностных лиц (200 р.)
-					</label>
-					<label id="variant7" class="" style="display: none;">
-						<input type="radio" name="type" id="type" value="7">
-						7) Заявление об оспаривании решения или действия (бездействия) органов государственной власти, органов местного самоуправления, должностных лиц, государственных или муниципальных служащих, нарушивших права и свободы граждан или организаций (200 р.)
-					</label>
-					<label id="variant8" class="" style="display: none;">
-						<input type="radio" name="type" id="type" value="8">
-						8) Заявление по делам особого производства (200 р.)
-					</label>
-					<label id="variant9" class="" style="display: none;">
-						<input type="radio" name="type" id="type" value="9">
-						9) Апелляционная жалоба и (или) кассационная жалоба (100 р.)
-					</label>
-					<label id="variant10" class="" style="display: none;">
-						<table border="0" cellspacing="0" cellpadding="0">
-							<tbody><tr>
-								<td>
-									<input type="radio" name="type" id="type" value="10">
-									10) Заявления о повторной выдаче копий решений, приговоров, судебных приказов, определений суда, постановлений президиума суда надзорной инстанции, копий других документов из дела, выдаваемых судом, а также заявление о выдаче дубликатов исполнительных документов.
-								</td>
-								<td width="20">&nbsp;</td>
-								<td width="200">
-									<strong>Количество страниц:</strong>
-									<input name="pages" type="text" id="pages" onchange="calc();" onmouseout="calc();" onkeyup="calc();" value="1" size="4">
-									<br>
-									<br>
-									(4 рубля за одну страницу документа, но не менее 40 рублей; )
-								</td>
-							</tr>
-						</tbody></table>
-					</label>
-					<label id="variant11" class="" style="display: none;">
-						<input type="radio" name="type" id="type" value="11">
-						11) Заявление о выдаче исполнительных листов на принудительное исполнение решений третейского суда (1 500 р.)
-					</label>
-					<label id="variant12" class="" style="display: none;">
-						<input type="radio" name="type" id="type" value="12">
-						12)  Заявление об обеспечении иска, рассматриваемого в третейском суде  (200 р.)
-					</label>
-					<label id="variant13" class="" style="display: none;">
-						<input type="radio" name="type" id="type" value="13">
-						13)  Заявление об отмене решения третейского суда - (1 500 р.)
-					</label>
-					<label id="variant14" class="" style="display: none;">
-						<input type="radio" name="type" id="type" value="14">
-						14) Заявление по делам о взыскании алиментов на детей - (100 р.)
-					</label>
-					<label id="variant15" class="" style="display: none;">
-						<input type="radio" name="type" id="type" value="14b">
-						14б) Взыскание алиментов как на содержание детей, так и на содержание истца (200 р.)
-					</label>
-					<label id="variant16" class="" style="display: none;">
-						<input type="radio" name="type" id="type" value="15">
-						15) Заявления о присуждении компенсации за нарушение права на судопроизводство в разумный срок или права на исполнение судебного акта в разумный срок (200 р.)
-					</label>
-				</div>
-				<div id="display_other">
-					<table border="0" cellspacing="0" cellpadding="0" width="100%">
-						<tbody><tr>
-							<td><input align="left" type="button" value="Показать все" onclick="show_all();" id="display_other_buttton" style="display: inline;"></td>
-							<td align="right">
-								Госпошлина, рублей:
-								<input name="summ" type="text" id="summ" value="0" size="12">
-								<input type="submit" name="kvitancia" id="kvitancia" value="Выписать квитанцию" onclick="calc();">
-							</td>
-						</tr>
-					</tbody></table>
-				</div>
-			</form>
-
-<!-- END: Modules Anywhere -->
-
-			<p>&nbsp;</p>
-			<p style="text-align: justify;"><span style="font-size: 14px;"><strong>Особенности уплаты государственной пошлины при обращении в суды общей юрисдикции, к мировым судьям</strong></span><br> <br> 1. По делам, рассматриваемым в судах общей юрисдикции, мировыми судьями, <a href="/kalkylyator-gosposhlini">государственная пошлина</a> уплачивается с учетом следующих особенностей:<br> <br> 1) при <a href="/articles/sroki-podachi-iskovogo-zayavleniya">подаче исковых заявлений</a>, содержащих требования как имущественного, так и неимущественного характера, одновременно уплачиваются государственная пошлина, установленная для исковых заявлений имущественного характера, и государственная пошлина, установленная для исковых заявлений неимущественного характера;<br> <br> 2) цена иска, по которой исчисляется государственная пошлина, определяется истцом, а в случаях, установленных законодательством, судьей по правилам, установленным гражданским процессуальным законодательством Российской Федерации;</p>
-			<p style="text-align: justify;">2.1)&nbsp;при подаче заявления об оспаривании нормативных правовых актов федеральных органов исполнительной власти, затрагивающих права и законные интересы заявителя в области правовой охраны результатов интеллектуальной деятельности и средств индивидуализации, в том числе в сфере патентных прав и прав на селекционные достижения, права на топологии интегральных микросхем, права на секреты производства (ноу-хау), права на средства индивидуализации юридических лиц, товаров, работ, услуг и предприятий, права использования результатов интеллектуальной деятельности в составе единой технологии: для физических лиц - 300 рублей;<br> <br> 3) при подаче исковых заявлений о разделе имущества, находящегося в общей собственности, а также при подаче исковых заявлений о выделе доли из указанного имущества, о признании права на долю в имуществе размер государственной пошлины исчисляется в следующем порядке:<br> <br> если спор о признании права собственности истца (истцов) на это имущество ранее не решался судом - в соответствии с подпунктом 1 пункта 1 статьи 333.19 настоящего Кодекса;<br> <br> если ранее суд вынес решение о признании права собственности истца (истцов) на указанное имущество - в соответствии с подпунктом 3 пункта 1 статьи 333.19 настоящего Кодекса;<br> <br> 4) при предъявлении встречного иска, а также заявлений о вступлении в дело третьих лиц, заявляющих самостоятельные требования относительно предмета спора, государственная пошлина уплачивается в соответствии с положениями статьи 333.19 настоящего Кодекса;<br> <br> 5) при замене по определению суда выбывшей стороны ее правопреемником (в случае смерти физического лица, реорганизации организации, уступки требования, перевода долга и в других случаях перемены лиц в обязательствах) государственная пошлина уплачивается таким правопреемником, если она не была уплачена замененной стороной;<br> <br> 6) в случае выделения судьей одного искового требования или нескольких из соединенных исковых требований в отдельное производство государственная пошлина, уплаченная при предъявлении иска, не пересчитывается и не возвращается. По делам, выделенным в отдельное производство, государственная пошлина повторно не уплачивается;<br> <br> 7) при подаче кассационной жалобы соучастниками и третьими лицами, <a href="/steps/vistyplenie-v-syde">выступающими в процессе</a> на той же стороне, что и лицо, подавшее кассационную жалобу, государственная пошлина не уплачивается;<br> <br> 8) в случае, если истец освобожден от уплаты государственной пошлины в соответствии с настоящей главой, государственная пошлина уплачивается ответчиком (если он не освобожден от уплаты государственной пошлины) пропорционально размеру удовлетворенных судом исковых требований;<br> <br> 9) при затруднительности определения цены иска в момент его предъявления размер государственной пошлины предварительно устанавливается судьей с последующей доплатой недостающей суммы государственной пошлины на основании цены иска, определенной судом при разрешении дела, в срок, установленный подпунктом 2 пункта 1 статьи 333.18 настоящего Кодекса;<br> <br> 10) при увеличении истцом размера исковых требований недостающая сумма государственной пошлины доплачивается в соответствии с увеличенной ценой иска в срок, установленный подпунктом 2 пункта 1 статьи 333.18 настоящего Кодекса. При уменьшении истцом размера исковых требований сумма излишне уплаченной государственной пошлины возвращается в порядке, предусмотренном статьей 333.40 настоящего Кодекса. В аналогичном порядке определяется размер государственной пошлины, если суд в зависимости от обстоятельств дела выйдет за пределы заявленных истцом требований;<br> <br> 11) при <a href="/articles/sroki-podachi-iskovogo-zayavleniya">подаче исковых заявлений</a> об истребовании наследниками принадлежащей им доли имущества государственная пошлина уплачивается в том порядке, который установлен при подаче исковых заявлений имущественного характера, не подлежащих оценке, если спор о признании права собственности на это имущество судом ранее был разрешен;<br> <br> 12) при подаче исковых заявлений о расторжении брака с одновременным разделом совместно нажитого имущества супругов государственная пошлина уплачивается в размерах, установленных как для исковых заявлений о расторжении брака, так и для исковых заявлений имущественного характера;<br> <br> 13) при отказе в принятии к рассмотрению искового заявления или заявления о вынесении судебного приказа уплаченная государственная пошлина при предъявлении иска или заявления о вынесении судебного приказа засчитывается в счет подлежащей уплате государственной пошлины;</p>
-			<p style="text-align: justify;">14)&nbsp;при подаче заявления о присуждении компенсации за нарушение права на судопроизводство в разумный срок или права на исполнение судебного акта в разумный срок:</p>
-			<p style="text-align: justify;">для физических лиц - 300 рублей;<br> <br> 2. Суды общей юрисдикции или мировые судьи, исходя из имущественного положения плательщика, вправе уменьшить размер государственной пошлины, подлежащей уплате по делам, рассматриваемым указанными судами или мировыми судьями, либо отсрочить (рассрочить) ее уплату в порядке, предусмотренном статьей 333.41 настоящего Кодекса.</p>
-		</div>
-
-
-		<div class="item-page">
-			<h1>Выписать квитанцию</h1>
-			<p style="text-align: center;"><strong>Оформить квитанцию для уплаты госопшлины</strong></p>
-			<p style="text-align: justify;">На настоящей странице Вы можете оформить квитанцию для <a href="/kalkylyator-gosposhlini">оплаты госпошлины</a> и распечатать ее для последующей оплаты.</p>
-			<p style="text-align: justify;">Для этого, Вам нужно заполнить все поля, расположенные ниже и нажать кнопку "скачать заполненную квитанцию".</p>
-			<p style="text-align: justify;">Внимание! Реквизиты, заполненные в квитанции по умолчанию являются демонстративными и не подходят для уплаты госпошлины!</p>
-			<p style="text-align: justify;">При заполнении квитанции, введите реквизиты суда, в который вы будете <a href="/articles/sroki-podachi-iskovogo-zayavleniya">подавать заявление</a>.</p>
-
-
-			<form name="kvitanciya" id="kvitanciaform" ng-controller="CourtsOfLaw as courts" ng-submit="kvitanciya.$valid" novalidate>
-				<div id="msg"></div>
-				<table width="100%" border="0" id="kvitanciatable">
-					<tbody><tr>
-						<td width="250px">Наименование получателя:</td>
-						<td>
-							<select ng-model="printedCourt"
-									ng-options="court as court.adress for court in courts.allCourts track by court.id"
-									name="rajon_choice" 
-									id="rajon_choice"
-									required>
-							<option value="">Выберите районный суд ...</option>
-							</select>
-							<input name="FIELDPOLUCHATEL" type="hidden" id="FIELDPOLUCHATEL" value="УФК МФ РФ по Г. Москве" size="40">
-						</td>
-					</tr>
-					<tr>
-						<td>КПП:</td>
-						<td><input name="KPP" type="text" id="KPP" size="100" readonly="readonly" class="readonly" ng-value="printedCourt.kpp"></td>
-					</tr>
-					<tr>
-						<td>ИНН</td>
-						<td><input name="FIELDINN" type="text" id="FIELDINN" size="100" readonly="readonly" class="readonly" ng-value="printedCourt.inn"></td>
-					</tr>
-					<tr>
-						<td>Код ОКТМО</td>
-						<td>
-							<input name="FIELDOKATO" type="text" id="FIELDOKATO" size="100" readonly="readonly" class="readonly" style="display: block;" ng-value="printedCourt.okato">
-							<select id="FIELDOKATO_2" style="display: none;"></select>
-						</td>
-					</tr>
-					<tr>
-						<td>Номер счета получателя платежа</td>
-						<td><input name="FIELDSCHET" type="text" id="FIELDSCHET" size="100" readonly="readonly" class="readonly" ng-value="printedCourt.schet"></td>
-					</tr>
-					<tr>
-						<td>Наименование Банка</td>
-						<td><input name="FIELDUCHREJDENIE" type="text" id="FIELDUCHREJDENIE" size="100" readonly="readonly" class="readonly" ng-value="printedCourt.ucherejdenie"></td>
-					</tr>
-					<tr>
-						<td>БИК</td>
-						<td><input name="FIELDBIK" type="text" id="FIELDBIK" value="044583001" size="100" readonly="readonly" class="readonly"></td>
-					</tr>
-					<tr>
-						<td>Наименование платежа</td>
-						<td><input name="FIELDVIDPLATEJA" type="text" id="FIELD VID PLATEJA" value="Госпошлина" size="100" readonly="readonly" class="readonly"></td>
-					</tr>
-					<tr>
-						<td>Код бюджетной классификации (КБК)</td>
-						<td><input name="FIELDKBK" type="text" id="FIELDKBK" size="100" readonly="readonly" class="readonly" ng-value="printedCourt.kbk"></td>
-					</tr>
-				 	<tr>
-						<td>ФИО плательщика<span class="red">*</span></td>
-						<td><input name="FIELDFIO" type="text" id="FIELDFIO" size="100" ng-model="courts.userInput.name" required></td>
-					</tr>
-					<tr>
-						<td>Адрес Плательшика<span class="red">*</span></td>
-						<td><input name="FIELDADRESS" type="text" id="FIELDADRESS" size="100" ng-model="courts.userInput.adress" required></td>
-					</tr>
-					<tr>
-				  		<td>Дата</td>
-						<td><input name="FIELDDATE" type="text" id="FIELDDATE" size="30" ng-value="courts.userInput.date | date:'dd.MM.yyyy г.'" required></td>
-					</tr>
-					<tr>
-						<td>Сумма<span class="red">*</span></td>
-						<td><input name="FIELDSUMM" type="text" id="FIELDSUMM" size="30" ng-model="courts.userInput.summ" required></td>
-					</tr>
-				</tbody></table>
-				<br>
-				<div align="center">
-					<input type="submit" name="Рассчитать" id="Рассчитать" value="Скачать заполненную квитанцию">
-				</div>
-			</form>
-			<script type="text/javascript">
-				field_okato_text = document.getElementById("FIELDOKATO");
-				field_okato_select = document.getElementById("FIELDOKATO_2");
-				field_okato_text.style.display = "block";
-				field_okato_select.style.display = "none";
-			</script>
-			<!-- END: Modules Anywhere -->
-		</div>
-
+		<div ui-view></div>
 
 	</div>
 </div>

@@ -1,19 +1,160 @@
 (function(){
-	var myApp = angular.module('receipt', []);
+	var myApp = angular.module('receiptApp', ['ui.router'])
+					.config(function($stateProvider, $urlRouterProvider) {
+					  //
+					  // Любые неопределенные url перенаправлять на /state1
+					  $urlRouterProvider.otherwise("/calc");
+					  //
+					  // Теперь определим состояния
+					  $stateProvider
+					    .state('calc', {
+					      url: "/calc",
+					      templateUrl: "js/templates/calc.html"
+					    })
+					    .state('kvit', {
+					      url: "/kvit",
+					      templateUrl: "js/templates/kvit.html"
+					    })
+					});
 
-	myApp.controller('CourtsOfLaw', function($scope){
+	myApp.service('sharedProperties', function(){
+		var property = '';
+
+		return {
+			getProperty: function(){
+				return property;
+			},
+			setPropery: function(val){
+				property = val;
+			}
+		}
+	});
+
+
+	myApp.controller('CourtsOfLaw', function($scope, sharedProperties){
+		var self = this;
 		this.allCourts = courtsData;
 		this.userInput = {
 			date: new Date(),
 			name: null,
 			adress: null,
 			summ: null
-			}
+			};
 
-		$scope.printedCourt = {};
+		this.userInput.summ = sharedProperties.getProperty();
+
+		$scope.printedCourt = {
+			id: null,
+			poluchatel: null,
+			kpp: null,
+			inn: null,
+			okato: null,
+			schet: null,
+			ucherejdenie: null,
+			kbk: null,
+			adress: null
+		};
+
+		$scope.submit = function(){
+
+			var loadFile=function(url,callback){
+		        JSZipUtils.getBinaryContent(url,callback);
+		    }
+		    loadFile("js/kvitancia.docx",function(err,content){
+		        if (err) { throw e};
+		        doc=new Docxgen(content);
+		        doc.setData( {'fio': self.userInput.name || '',
+					'adress':self.userInput.adress || '',
+					'date':self.userInput.date.getDate() + '.' + ('0' + (+self.userInput.date.getMonth() + 1)).slice(-2) + '.' + self.userInput.date.getFullYear() + ' г.',
+					'summ':self.userInput.summ || '',
+					'inn': $scope.printedCourt.inn || '',
+					'kbk': $scope.printedCourt.kbk || '',
+					'kpp': $scope.printedCourt.kpp || '',
+					'okato': $scope.printedCourt.okato || '',
+					'poluchatel': $scope.printedCourt.poluchatel || '',
+					'schet': $scope.printedCourt.schet || '',
+					'ucherejdenie': $scope.printedCourt.ucherejdenie || ''
+					}
+		        ) //set the templateVariables
+		        doc.render() //apply them (replace all occurences of {first_name} by Hipp, ...)
+		        out=doc.getZip().generate({type:"blob"}) //Output the document using Data-URI
+		        saveAs(out,"output.docx")
+		    });
+
+		};
 	});
 
+	myApp.controller('Calculator', function($scope, sharedProperties){
+		function extend(obj1, obj2){
+		    for (key in obj2){
+		      obj1[key]=obj2[key];
+		    }
+		    return obj1;
+		}
 
+		$scope.showOption = function(num){
+			if ($scope.calcModel.id == 0){
+				return true;
+			}else if ($scope.calcModel.id == num){
+				return true;
+			}else{
+				return false;
+			};
+		};
+
+		$scope.selectOption = function(num, summ){
+			if (summ) {
+				$scope.calcModel.result = summ;
+			};
+
+			$scope.calcModel.id = num;
+		};
+
+		$scope.calcModel = {
+			'id': 1,
+			'pages': null,
+			'summ': null,
+			'result': 200
+		};
+
+		$scope.$watch('calcModel.pages', function(){
+			if ($scope.calcModel.pages < 10) {
+				$scope.calcModel.result = 40;
+			} else {
+				$scope.calcModel.result = $scope.calcModel.pages * 4;
+			}
+
+		});
+
+		$scope.$watch('calcModel.summ', function(newValue, oldValue){
+			$scope.calcModel.result = $scope.calcModel.summ * 0.04;
+			if ($scope.calcModel.result < 400){
+				$scope.calcModel.result = 400;
+			} else if (20000 < $scope.calcModel.summ && $scope.calcModel.summ <= 100000){
+				$scope.calcModel.result = 800 + ($scope.calcModel.summ - 20000) * 0.03;
+			} else if (100000 < $scope.calcModel.summ && $scope.calcModel.summ <= 200000){
+				$scope.calcModel.result = 3200 + ($scope.calcModel.summ - 100000) * 0.02;
+			} else if (200000 < $scope.calcModel.summ && $scope.calcModel.summ <= 1000000){
+				$scope.calcModel.result = 5200 + ($scope.calcModel.summ - 200000) * 0.01;
+			} else if (1000000 < $scope.calcModel.summ){
+				$scope.calcModel.result = 13200 + ($scope.calcModel.summ - 1000000) * 0.005;
+			};
+			if ($scope.calcModel.result > 60000){
+				$scope.calcModel.result = 60000;
+			};
+
+			$scope.calcModel.result = Math.floor($scope.calcModel.result * 100) / 100;
+		});
+
+		$scope.$watch('calcModel.result', function(){
+			sharedProperties.setPropery($scope.calcModel.result);
+		});
+
+		$scope.log = function(n){
+			console.log(n);
+		}
+
+	});
 
 	var courtsData = [
 			{id: 3,
@@ -65,251 +206,296 @@
 			ucherejdenie: 'УФК МФ РФ по г. Москве',
 			kbk: '18210803010011000110',
 			adress: 'Головинский районный суд г. Москвы'
+			},
+			{id: 6,
+			poluchatel: 'УФК по г. Москве (ИФНС России № 30 по г.Москве )',
+			kpp: '773001001',
+			inn: '7730057570',
+			okato: '45318000',
+			schet: '40101810800000010041',
+			ucherejdenie: 'УФК МФ РФ по г. Москве',
+			kbk: '18210803010011000110',
+			adress: 'Дорогомиловский районный суд г. Москвы'
+			},
+			{id: 7,
+			poluchatel: 'УФК по г. Москве (ИФНС России № 5 по г.Москве )',
+			kpp: '770501001',
+			inn: '7705045236',
+			okato: '45376000',
+			schet: '40101810800000010041',
+			ucherejdenie: 'УФК МФ РФ по г. Москве',
+			kbk: '18210803010011000110',
+			adress: 'Замоскворецкий районный суд г. Москвы'
+			},
+			{id: 8,
+			poluchatel: 'УФК по г. Москве (ИФНС России № 35 по г.Москве )',
+			kpp: '773501001',
+			inn: '7735071603',
+			okato: '45330000',
+			schet: '40101810800000010041',
+			ucherejdenie: 'УФК МФ РФ по г. Москве',
+			kbk: '18210803010011000110',
+			adress: 'Зеленоградский районный суд г. Москвы'
+			},
+			{id: 9,
+			poluchatel: 'УФК по г. Москве (ИФНС России № 27 по г.Москве )',
+			kpp: '772701001',
+			inn: '7727092173',
+			okato: '45397000',
+			schet: '40101810800000010041',
+			ucherejdenie: 'УФК МФ РФ по г. Москве',
+			kbk: '18210803010011000110',
+			adress: 'Зюзинский районный суд г. Москвы'
+			},
+			{id: 10,
+			poluchatel: 'УФК по г. Москве (ИФНС России № 1 по г.Москве )',
+			kpp: '770901001',
+			inn: '7701107259',
+			okato: '45375000',
+			schet: '40101810800000010041',
+			ucherejdenie: 'Отделение 1 Москва',
+			kbk: '18210803010011000110',
+			adress: 'Измайловский районный суд г. Москвы'
+			},
+			{id: 11,
+			poluchatel: 'УФК по г. Москве (ИФНС России № 43 по г.Москве )',
+			kpp: '774301001',
+			inn: '7743777777',
+			okato: '45341000',
+			schet: '40101810800000010041',
+			ucherejdenie: 'УФК МФ РФ по г. Москве',
+			kbk: '18210803010011000110',
+			adress: 'Коптевский районный суд г. Москвы'
+			},
+			{id: 12,
+			poluchatel: 'УФК по г. Москве (ИФНС России № 21 по г.Москве )',
+			kpp: '772101001',
+			inn: '7721049904',
+			okato: '45394000',
+			schet: '40101810800000010041',
+			ucherejdenie: 'Отделение 1 Москва',
+			kbk: '18210803010011000110',
+			adress: 'Кузьминский районный суд г. Москвы'
+			},
+			{id: 13,
+			poluchatel: 'УФК по г. Москве (ИФНС России № 31 по г.Москве )',
+			kpp: '773101001',
+			inn: '7731154880',
+			okato: '45320000',
+			schet: '40101810800000010041',
+			ucherejdenie: 'УФК МФ РФ по г. Москве',
+			kbk: '18210803010011000110',
+			adress: 'Кунцевский районный суд г. Москвы'
+			},
+			{id: 14,
+			poluchatel: 'УФК по г. Москве (ИФНС России № 9 по г.Москве )',
+			kpp: '772201001',
+			inn: '7709000010',
+			okato: '45381000',
+			schet: '40101810800000010041',
+			ucherejdenie: 'УФК МФ РФ по г. Москве',
+			kbk: '18210803010011000110',
+			adress: 'Лефортовский районный суд г. Москвы'
+			},
+			{id: 16,
+			poluchatel: 'УФК по г. Москве (ИФНС России № 23 по г.Москве )',
+			kpp: '772301001',
+			inn: '7723013452',
+			okato: '45389000',
+			schet: '40101810800000010041',
+			ucherejdenie: 'УФК МФ РФ по г. Москве',
+			kbk: '18210803010011000110',
+			adress: 'Люблинский районный суд г. Москвы'
+			},
+			{id: 15,
+			poluchatel: 'УФК по г. Москве (ИФНС России № 8 по г.Москве )',
+			kpp: '770801001',
+			inn: '7708034472',
+			okato: '45378000',
+			schet: '40101810800000010041',
+			ucherejdenie: 'Отделение 1 Москва',
+			kbk: '18210803010011000110',
+			adress: 'Мещанский районный суд г. Москвы'
+			},
+			{id: 17,
+			poluchatel: 'УФК по г. Москве (ИФНС России № 24 по г.Москве )',
+			kpp: '772401001',
+			inn: '7724111558',
+			okato: '45918000',
+			schet: '40101810800000010041',
+			ucherejdenie: 'УФК МФ РФ по г. Москве',
+			kbk: '18210803010011000110',
+			adress: 'Нагатинский районный суд г. Москвы'
+			},
+			{id: 18,
+			poluchatel: 'УФК по г. Москве (ИФНС России № 29 по г.Москве )',
+			kpp: '772901001',
+			inn: '7729150007',
+			okato: '45325000',
+			schet: '40101810800000010041',
+			ucherejdenie: 'УФК МФ РФ по г. Москве',
+			kbk: '18210803010011000110',
+			adress: 'Никулинский районный суд г. Москвы'
+			},
+			{id: 19,
+			poluchatel: 'УФК МФ по г. Москве (ИФНС России № 17 г. Москвы)',
+			kpp: '771701001',
+			inn: '7717018935',
+			okato: '45358000',
+			schet: '40101810800000010041',
+			ucherejdenie: 'Отделение 1 Москва',
+			kbk: '18210803010011000110',
+			adress: 'Останкинский районный суд г. Москвы'
+			},
+			{id: 20,
+			poluchatel: 'УФК по г. Москве (ИФНС России № 20 по г.Москве )',
+			kpp: '772001001',
+			inn: '7720143220',
+			okato: '45312000',
+			schet: '40101810800000010041',
+			ucherejdenie: 'Отделение 1 Москва',
+			kbk: '18210803010011000110',
+			adress: 'Перовский районный суд г. Москвы'
+			},
+			{id: 21,
+			poluchatel: 'УФК по г. Москве (ИФНС России № 18 по г.Москве )',
+			kpp: '771801001',
+			inn: '7718111790',
+			okato: '45316000',
+			schet: '40101810800000010041',
+			ucherejdenie: 'Отделение 1 Москва',
+			kbk: '18210803010011000110',
+			adress: 'Преображенский районный суд г. Москвы'
+			},
+			{id: 22,
+			poluchatel: 'УФК по г. Москве (ИФНС России № 3 по г.Москве )',
+			kpp: '770301001',
+			inn: '7703037470',
+			okato: '45380000',
+			schet: '40101810800000010041',
+			ucherejdenie: 'УФК МФ РФ по г. Москве',
+			kbk: '18210803010011000110',
+			adress: 'Пресненский районный суд г. Москвы'
+			},
+			{id: 23,
+			poluchatel: 'УФК по г. Москве (ИФНС России № 10 по г.Москве )',
+			kpp: '771001001',
+			inn: '7710047253',
+			okato: '45382000',
+			schet: '40101810800000010041',
+			ucherejdenie: 'УФК МФ РФ по г. Москве',
+			kbk: '18210803010011000110',
+			adress: 'Савеловский районный суд г. Москвы'
+			},
+			{id: 24,
+			poluchatel: 'УФК по г. Москве (ИФНС России № 25 по г.Москве )',
+			kpp: ' 772501001',
+			inn: '7725068979',
+			okato: '45914000',
+			schet: '40101810800000010041',
+			ucherejdenie: 'Отделение 1 Москва',
+			kbk: '18210803010011000110',
+			adress: 'Симоновский районный суд г. Москвы'
+			},
+			{id: 25,
+			poluchatel: 'УФК МФ РФ по г. Москве (ИФНС России № 29 по г.Москве)',
+			kpp: '772901001',
+			inn: '7729150007',
+			okato: '45326000',
+			schet: '40101810800000010041',
+			ucherejdenie: 'Отделение 1 Москва',
+			kbk: '18210803010011000110',
+			adress: 'Солнцевский районный суд г. Москвы'
+			},
+			{id: 26,
+			poluchatel: 'УФК по г. Москве (ИФНС России № 9 по г.Москве )',
+			kpp: '770901001',
+			inn: '7709000010',
+			okato: '45381000',
+			schet: '40101810800000010041',
+			ucherejdenie: 'УФК МФ РФ по г. Москве',
+			kbk: '18210803010011000110',
+			adress: 'Таганский районный суд г. Москвы'
+			},
+			{id: 27,
+			poluchatel: 'УФК по г. Москве (ИФНС России № 7 по г.Москве )',
+			kpp: '770701001',
+			inn: '7707081688',
+			okato: '45382000',
+			schet: '40101810800000010041',
+			ucherejdenie: 'УФК МФ РФ по г. Москве',
+			kbk: '18210803010011000110',
+			adress: 'Тверской районный суд г. Москвы'
+			},
+			{id: 28,
+			poluchatel: 'УФК по г. Москве (ИФНС России № 13 по г.Москве )',
+			kpp: '771301001',
+			inn: '7713034630',
+			okato: '45346000',
+			schet: '40101810800000010041',
+			ucherejdenie: 'Отделение 1 Москва',
+			kbk: '18210803010011000110',
+			adress: 'Тимирязевский районный суд г. Москвы'
+			},
+			{id: 29,
+			poluchatel: 'УФК по г. Москве (ИФНС России № 33 по г.Москве )',
+			kpp: '773301001',
+			inn: '7733053334',
+			okato: '45368000',
+			schet: '40101810800000010041',
+			ucherejdenie: 'УФК МФ РФ по г. Москве',
+			kbk: '18210803010011000110',
+			adress: 'Тушинский районный суд г. Москвы'
+			},
+			{id: 31,
+			poluchatel: 'УФК по г. Москве (ИФНС России № 4 по г.Москве )',
+			kpp: '770401001',
+			inn: '7704058987',
+			okato: '45383000',
+			schet: '40101810800000010041',
+			ucherejdenie: 'УФК МФ РФ по г. Москве',
+			kbk: '18210803010011000110',
+			adress: 'Хамовнический районный суд г. Москвы'
+			},
+			{id: 32,
+			poluchatel: 'УФК по г. Москве (ИФНС России № 34 по г.Москве )',
+			kpp: '773401001',
+			inn: '7734110842',
+			okato: '45371000',
+			schet: '40101810800000010041',
+			ucherejdenie: 'УФК МФ РФ по г. Москве',
+			kbk: '18210803010011000110',
+			adress: 'Хорошевский районный суд г. Москвы'
+			},
+			{id: 30,
+			poluchatel: 'УФК по г. Москве (ИФНС России № 27 по г.Москве )',
+			kpp: '772701001',
+			inn: '7727092173',
+			okato: '45397000',
+			schet: '40101810800000010041',
+			ucherejdenie: 'УФК МФ РФ по г. Москве',
+			kbk: '18210803010011000110',
+			adress: 'Черемушкинский районный суд г. Москвы'
+			},
+			{id: 33,
+			poluchatel: 'УФК по г. Москве (ИФНС России № 26 по г.Москве )',
+			kpp: '772601001',
+			inn: '7726062105',
+			okato: '45920000',
+			schet: '40101810800000010041',
+			ucherejdenie: 'УФК МФ РФ по г. Москве',
+			kbk: '18210803010011000110',
+			adress: 'Чертановский районный суд г. Москвы'
+			},
+			{id: 34,
+			poluchatel: 'УФК МФ по г. Москве (ИФНС России № 24 г. Москвы)',
+			kpp: '772401001',
+			inn: '7724111558',
+			okato: '45918000',
+			schet: '40101810800000010041',
+			ucherejdenie: 'Отделение 1 Москва',
+			kbk: '18210803010011000110',
+			adress: 'Щербинский районный суд г. Москвы'
 			}
-
-
-
-
-			// FIELDPOLUCHATEL[1] = ;
-			// FIELDKPP[1] = ;
-			// FIELDINN[1] = ;
-			// FIELDOKATO[1] = ;
-			// FIELDSCHET[1] = 
-			// FIELDUCHREJDENIE[1] = ;
-			// FIELDKBK[1] = ;
-			// FIELDADRESS[1] = ;
-			// FIELDPOLUCHATEL[6] = 'УФК по г. Москве (ИФНС России № 30 по г.Москве )';
-			// FIELDKPP[6] = '773001001';
-			// FIELDINN[6] = '7730057570';
-			// FIELDOKATO[6] = '45318000';
-			// FIELDSCHET[6] = '40101810800000010041';
-			// FIELDUCHREJDENIE[6] = 'УФК МФ РФ по г. Москве';
-			// FIELDKBK[6] = '18210803010011000110';
-			// FIELDADRESS[6] = 'Дорогомиловский районный суд г. Москвы';
-			// FIELDPOLUCHATEL[7] = 'УФК по г. Москве (ИФНС России № 5 по г.Москве )';
-			// FIELDKPP[7] = '770501001';
-			// FIELDINN[7] = '7705045236';
-			// FIELDOKATO[7] = '45376000';
-			// FIELDSCHET[7] = '40101810800000010041';
-			// FIELDUCHREJDENIE[7] = 'УФК МФ РФ по г. Москве';
-			// FIELDKBK[7] = '18210803010011000110';
-			// FIELDADRESS[7] = 'Замоскворецкий районный суд г. Москвы';
-			// FIELDPOLUCHATEL[8] = 'УФК по г. Москве (ИФНС России № 35 по г.Москве )';
-			// FIELDKPP[8] = '773501001';
-			// FIELDINN[8] = '7735071603';
-			// FIELDOKATO[8] = '45330000';
-			// FIELDSCHET[8] = '40101810800000010041';
-			// FIELDUCHREJDENIE[8] = 'УФК МФ РФ по г. Москве';
-			// FIELDKBK[8] = '18210803010011000110';
-			// FIELDADRESS[8] = 'Зеленоградский районный суд г. Москвы';
-			// FIELDPOLUCHATEL[9] = 'УФК по г. Москве (ИФНС России № 27 по г.Москве )';
-			// FIELDKPP[9] = '772701001';
-			// FIELDINN[9] = '7727092173';
-			// FIELDOKATO[9] = '45397000';
-			// FIELDSCHET[9] = '40101810800000010041';
-			// FIELDUCHREJDENIE[9] = 'УФК МФ РФ по г. Москве';
-			// FIELDKBK[9] = '18210803010011000110';
-			// FIELDADRESS[9] = 'Зюзинский районный суд г. Москвы';
-			// FIELDPOLUCHATEL[10] = 'УФК по г. Москве (ИФНС России № 1 по г.Москве )';
-			// FIELDKPP[10] = '770901001';
-			// FIELDINN[10] = '7701107259';
-			// FIELDOKATO[10] = '45375000';
-			// FIELDSCHET[10] = '40101810800000010041';
-			// FIELDUCHREJDENIE[10] = 'Отделение 1 Москва';
-			// FIELDKBK[10] = '18210803010011000110';
-			// FIELDADRESS[10] = 'Измайловский районный суд г. Москвы';
-			// FIELDPOLUCHATEL[11] = 'УФК по г. Москве (ИФНС России № 43 по г.Москве )';
-			// FIELDKPP[11] = '774301001';
-			// FIELDINN[11] = '7743777777';
-			// FIELDOKATO[11] = '45341000';
-			// FIELDSCHET[11] = '40101810800000010041';
-			// FIELDUCHREJDENIE[11] = 'УФК МФ РФ по г. Москве';
-			// FIELDKBK[11] = '18210803010011000110';
-			// FIELDADRESS[11] = 'Коптевский районный суд г. Москвы';
-			// FIELDPOLUCHATEL[12] = 'УФК по г. Москве (ИФНС России № 21 по г.Москве )';
-			// FIELDKPP[12] = '772101001';
-			// FIELDINN[12] = '7721049904';
-			// FIELDOKATO[12] = '45394000';
-			// FIELDSCHET[12] = '40101810800000010041';
-			// FIELDUCHREJDENIE[12] = 'Отделение 1 Москва';
-			// FIELDKBK[12] = '18210803010011000110';
-			// FIELDADRESS[12] = 'Кузьминский районный суд г. Москвы';
-			// FIELDPOLUCHATEL[13] = 'УФК по г. Москве (ИФНС России № 31 по г.Москве )';
-			// FIELDKPP[13] = '773101001';
-			// FIELDINN[13] = '7731154880';
-			// FIELDOKATO[13] = '45320000';
-			// FIELDSCHET[13] = '40101810800000010041';
-			// FIELDUCHREJDENIE[13] = 'УФК МФ РФ по г. Москве';
-			// FIELDKBK[13] = '18210803010011000110';
-			// FIELDADRESS[13] = 'Кунцевский районный суд г. Москвы';
-			// FIELDPOLUCHATEL[14] = 'УФК по г. Москве (ИФНС России № 9 по г.Москве )';
-			// FIELDKPP[14] = '772201001';
-			// FIELDINN[14] = '7709000010';
-			// FIELDOKATO[14] = '45381000';
-			// FIELDSCHET[14] = '40101810800000010041';
-			// FIELDUCHREJDENIE[14] = 'УФК МФ РФ по г. Москве';
-			// FIELDKBK[14] = '18210803010011000110';
-			// FIELDADRESS[14] = 'Лефортовский районный суд г. Москвы';
-			// FIELDPOLUCHATEL[16] = 'УФК по г. Москве (ИФНС России № 23 по г.Москве )';
-			// FIELDKPP[16] = '772301001';
-			// FIELDINN[16] = '7723013452';
-			// FIELDOKATO[16] = '45389000';
-			// FIELDSCHET[16] = '40101810800000010041';
-			// FIELDUCHREJDENIE[16] = 'УФК МФ РФ по г. Москве';
-			// FIELDKBK[16] = '18210803010011000110';
-			// FIELDADRESS[16] = 'Люблинский районный суд г. Москвы';
-			// FIELDPOLUCHATEL[15] = 'УФК по г. Москве (ИФНС России № 8 по г.Москве )';
-			// FIELDKPP[15] = '770801001';
-			// FIELDINN[15] = '7708034472';
-			// FIELDOKATO[15] = '45378000';
-			// FIELDSCHET[15] = '40101810800000010041';
-			// FIELDUCHREJDENIE[15] = 'Отделение 1 Москва';
-			// FIELDKBK[15] = '18210803010011000110';
-			// FIELDADRESS[15] = 'Мещанский районный суд г. Москвы';
-			// FIELDPOLUCHATEL[17] = 'УФК по г. Москве (ИФНС России № 24 по г.Москве )';
-			// FIELDKPP[17] = '772401001';
-			// FIELDINN[17] = '7724111558';
-			// FIELDOKATO[17] = '45918000';
-			// FIELDSCHET[17] = '40101810800000010041';
-			// FIELDUCHREJDENIE[17] = 'УФК МФ РФ по г. Москве';
-			// FIELDKBK[17] = '18210803010011000110';
-			// FIELDADRESS[17] = 'Нагатинский районный суд г. Москвы';
-			// FIELDPOLUCHATEL[18] = 'УФК по г. Москве (ИФНС России № 29 по г.Москве )';
-			// FIELDKPP[18] = '772901001';
-			// FIELDINN[18] = '7729150007';
-			// FIELDOKATO[18] = '45325000';
-			// FIELDSCHET[18] = '40101810800000010041';
-			// FIELDUCHREJDENIE[18] = 'УФК МФ РФ по г. Москве';
-			// FIELDKBK[18] = '18210803010011000110';
-			// FIELDADRESS[18] = 'Никулинский районный суд г. Москвы';
-			// FIELDPOLUCHATEL[19] = 'УФК МФ по г. Москве (ИФНС России № 17 г. Москвы)';
-			// FIELDKPP[19] = '771701001';
-			// FIELDINN[19] = '7717018935';
-			// FIELDOKATO[19] = '45358000';
-			// FIELDSCHET[19] = '40101810800000010041';
-			// FIELDUCHREJDENIE[19] = 'Отделение 1 Москва';
-			// FIELDKBK[19] = '18210803010011000110';
-			// FIELDADRESS[19] = 'Останкинский районный суд г. Москвы';
-			// FIELDPOLUCHATEL[20] = 'УФК по г. Москве (ИФНС России № 20 по г.Москве )';
-			// FIELDKPP[20] = '772001001';
-			// FIELDINN[20] = '7720143220';
-			// FIELDOKATO[20] = '45312000';
-			// FIELDSCHET[20] = '40101810800000010041';
-			// FIELDUCHREJDENIE[20] = 'Отделение 1 Москва';
-			// FIELDKBK[20] = '18210803010011000110';
-			// FIELDADRESS[20] = 'Перовский районный суд г. Москвы';
-			// FIELDPOLUCHATEL[21] = 'УФК по г. Москве (ИФНС России № 18 по г.Москве )';
-			// FIELDKPP[21] = '771801001';
-			// FIELDINN[21] = '7718111790';
-			// FIELDOKATO[21] = '45316000';
-			// FIELDSCHET[21] = '40101810800000010041';
-			// FIELDUCHREJDENIE[21] = 'Отделение 1 Москва';
-			// FIELDKBK[21] = '18210803010011000110';
-			// FIELDADRESS[21] = 'Преображенский районный суд г. Москвы';
-			// FIELDPOLUCHATEL[22] = 'УФК по г. Москве (ИФНС России № 3 по г.Москве )';
-			// FIELDKPP[22] = '770301001';
-			// FIELDINN[22] = '7703037470';
-			// FIELDOKATO[22] = '45380000';
-			// FIELDSCHET[22] = '40101810800000010041';
-			// FIELDUCHREJDENIE[22] = 'УФК МФ РФ по г. Москве';
-			// FIELDKBK[22] = '18210803010011000110';
-			// FIELDADRESS[22] = 'Пресненский районный суд г. Москвы';
-			// FIELDPOLUCHATEL[23] = 'УФК по г. Москве (ИФНС России № 10 по г.Москве )';
-			// FIELDKPP[23] = '771001001';
-			// FIELDINN[23] = '7710047253';
-			// FIELDOKATO[23] = '45382000';
-			// FIELDSCHET[23] = '40101810800000010041';
-			// FIELDUCHREJDENIE[23] = 'УФК МФ РФ по г. Москве';
-			// FIELDKBK[23] = '18210803010011000110';
-			// FIELDADRESS[23] = 'Савеловский районный суд г. Москвы';
-			// FIELDPOLUCHATEL[24] = 'УФК по г. Москве (ИФНС России № 25 по г.Москве )';
-			// FIELDKPP[24] = ' 772501001';
-			// FIELDINN[24] = '7725068979';
-			// FIELDOKATO[24] = '45914000';
-			// FIELDSCHET[24] = '40101810800000010041';
-			// FIELDUCHREJDENIE[24] = 'Отделение 1 Москва';
-			// FIELDKBK[24] = '18210803010011000110';
-			// FIELDADRESS[24] = 'Симоновский районный суд г. Москвы';
-			// FIELDPOLUCHATEL[25] = 'УФК МФ РФ по г. Москве (ИФНС России № 29 по г.Москве)';
-			// FIELDKPP[25] = '772901001';
-			// FIELDINN[25] = '7729150007';
-			// FIELDOKATO[25] = '45326000';
-			// FIELDSCHET[25] = '40101810800000010041';
-			// FIELDUCHREJDENIE[25] = 'Отделение 1 Москва';
-			// FIELDKBK[25] = '18210803010011000110';
-			// FIELDADRESS[25] = 'Солнцевский районный суд г. Москвы';
-			// FIELDPOLUCHATEL[26] = 'УФК по г. Москве (ИФНС России № 9 по г.Москве )';
-			// FIELDKPP[26] = '770901001';
-			// FIELDINN[26] = '7709000010';
-			// FIELDOKATO[26] = '45381000';
-			// FIELDSCHET[26] = '40101810800000010041';
-			// FIELDUCHREJDENIE[26] = 'УФК МФ РФ по г. Москве';
-			// FIELDKBK[26] = '18210803010011000110';
-			// FIELDADRESS[26] = 'Таганский районный суд г. Москвы';
-			// FIELDPOLUCHATEL[27] = 'УФК по г. Москве (ИФНС России № 7 по г.Москве )';
-			// FIELDKPP[27] = '770701001';
-			// FIELDINN[27] = '7707081688';
-			// FIELDOKATO[27] = '45382000';
-			// FIELDSCHET[27] = '40101810800000010041';
-			// FIELDUCHREJDENIE[27] = 'УФК МФ РФ по г. Москве';
-			// FIELDKBK[27] = '18210803010011000110';
-			// FIELDADRESS[27] = 'Тверской районный суд г. Москвы';
-			// FIELDPOLUCHATEL[28] = 'УФК по г. Москве (ИФНС России № 13 по г.Москве )';
-			// FIELDKPP[28] = '771301001';
-			// FIELDINN[28] = '7713034630';
-			// FIELDOKATO[28] = '45346000';
-			// FIELDSCHET[28] = '40101810800000010041';
-			// FIELDUCHREJDENIE[28] = 'Отделение 1 Москва';
-			// FIELDKBK[28] = '18210803010011000110';
-			// FIELDADRESS[28] = 'Тимирязевский районный суд г. Москвы';
-			// FIELDPOLUCHATEL[29] = 'УФК по г. Москве (ИФНС России № 33 по г.Москве )';
-			// FIELDKPP[29] = '773301001';
-			// FIELDINN[29] = '7733053334';
-			// FIELDOKATO[29] = '45368000';
-			// FIELDSCHET[29] = '40101810800000010041';
-			// FIELDUCHREJDENIE[29] = 'УФК МФ РФ по г. Москве';
-			// FIELDKBK[29] = '18210803010011000110';
-			// FIELDADRESS[29] = 'Тушинский районный суд г. Москвы';
-			// FIELDPOLUCHATEL[31] = 'УФК по г. Москве (ИФНС России № 4 по г.Москве )';
-			// FIELDKPP[31] = '770401001';
-			// FIELDINN[31] = '7704058987';
-			// FIELDOKATO[31] = '45383000';
-			// FIELDSCHET[31] = '40101810800000010041';
-			// FIELDUCHREJDENIE[31] = 'УФК МФ РФ по г. Москве';
-			// FIELDKBK[31] = '18210803010011000110';
-			// FIELDADRESS[31] = 'Хамовнический районный суд г. Москвы';
-			// FIELDPOLUCHATEL[32] = 'УФК по г. Москве (ИФНС России № 34 по г.Москве )';
-			// FIELDKPP[32] = '773401001';
-			// FIELDINN[32] = '7734110842';
-			// FIELDOKATO[32] = '45371000';
-			// FIELDSCHET[32] = '40101810800000010041';
-			// FIELDUCHREJDENIE[32] = 'УФК МФ РФ по г. Москве';
-			// FIELDKBK[32] = '18210803010011000110';
-			// FIELDADRESS[32] = 'Хорошевский районный суд г. Москвы';
-			// FIELDPOLUCHATEL[30] = 'УФК по г. Москве (ИФНС России № 27 по г.Москве )';
-			// FIELDKPP[30] = '772701001';
-			// FIELDINN[30] = '7727092173';
-			// FIELDOKATO[30] = '45397000';
-			// FIELDSCHET[30] = '40101810800000010041';
-			// FIELDUCHREJDENIE[30] = 'УФК МФ РФ по г. Москве';
-			// FIELDKBK[30] = '18210803010011000110';
-			// FIELDADRESS[30] = 'Черемушкинский районный суд г. Москвы';
-			// FIELDPOLUCHATEL[33] = 'УФК по г. Москве (ИФНС России № 26 по г.Москве )';
-			// FIELDKPP[33] = '772601001';
-			// FIELDINN[33] = '7726062105';
-			// FIELDOKATO[33] = '45920000';
-			// FIELDSCHET[33] = '40101810800000010041';
-			// FIELDUCHREJDENIE[33] = 'УФК МФ РФ по г. Москве';
-			// FIELDKBK[33] = '18210803010011000110';
-			// FIELDADRESS[33] = 'Чертановский районный суд г. Москвы';
-			// FIELDPOLUCHATEL[34] = 'УФК МФ по г. Москве (ИФНС России № 24 г. Москвы)';
-			// FIELDKPP[34] = '772401001';
-			// FIELDINN[34] = '7724111558';
-			// FIELDOKATO[34] = '45918000';
-			// FIELDSCHET[34] = '40101810800000010041';
-			// FIELDUCHREJDENIE[34] = 'Отделение 1 Москва';
-			// FIELDKBK[34] = '18210803010011000110';
-			// FIELDADRESS[34] = 'Щербинский районный суд г. Москвы';
-
 	];
 })();
